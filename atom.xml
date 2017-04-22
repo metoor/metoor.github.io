@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Metoor</title>
+  <subtitle>just do it.</subtitle>
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="http://metoor.github.io/"/>
+  <updated>2017-04-22T14:57:00.494Z</updated>
+  <id>http://metoor.github.io/</id>
+  
+  <author>
+    <name>Metoor</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>使用github+hexo搭建个人博客</title>
+    <link href="http://metoor.github.io/2017/04/22/%E4%BD%BF%E7%94%A8github-hexo%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/"/>
+    <id>http://metoor.github.io/2017/04/22/使用github-hexo搭建个人博客/</id>
+    <published>2017-04-22T07:22:38.000Z</published>
+    <updated>2017-04-22T14:57:00.494Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>　　这个是本站的第一篇文章，我们该写点什么呢？很简单我们就写下本站是怎么搭建的吧。我们需要用到的框架是<a href="https://hexo.io/" title="详情" target="_blank" rel="external">HEXO</a>： 是一个快速、简洁且高效的博客框架。Hexo 使用 Markdown（或其他渲染引擎）解析文章，在几秒内，即可利用靓丽的主题生成静态网页。<br><a id="more"></a></p>
+<h2 id="搭建node-js环境"><a href="#搭建node-js环境" class="headerlink" title="搭建node.js环境"></a>搭建node.js环境</h2><p>在安装HEXO之前需要先安装:</p>
+<ul>
+<li><a href="https://nodejs.org/en/download/" title="点我去下载" target="_blank" rel="external">Node.js</a></li>
+<li><a href="https://git-scm.com/downloads" title="点我去下载" target="_blank" rel="external">Git</a></li>
+</ul>
+<p>现在我们开始搭建Node.js环境，我这里以安装windows（win8.1）平台为例。点击上面的Node.js下载对应的版本</p>
+<img src="/2017/04/22/使用github-hexo搭建个人博客/downloadnode.png" alt="downloadnode.png" title="">
+<ol>
+<li>下载好后双击运行，跟着安装向导走就可以了，这里不多说。安装完成后正常情况下会自动设置好环境变量。</li>
+<li>点击开始-运行-cmd（win+R），打开dos，输入<code>node -v</code>检查Node.js版本：<br>出现上述输出则表示你已经成功安装node.js</li>
+<li>使用cmd命令行输入<code>npm -v</code>来测试是否安装成功,如果成功会输出npm的版本号，这里就不放图片了。</li>
+<li>好了到这一步node.js已经装好了。详细教程可以参考<a href="http://www.cnblogs.com/zhouyu2017/p/6485265.html" title="详细教程" target="_blank" rel="external">这里</a></li>
+</ol>
+<h2 id="安装git"><a href="#安装git" class="headerlink" title="安装git"></a>安装git</h2><p>点击上面的Git链接会打开如下页面：<br><img src="/2017/04/22/使用github-hexo搭建个人博客/downloadgit.png" alt="downloadgit.png" title=""></p>
+<ol>
+<li>下载好后，双击运行安装程序，跟着向导安装就好了。</li>
+<li>关于git的一些基本使用命令可以参考这里<a href="http://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000/" title="快点我" target="_blank" rel="external">点我</a></li>
+</ol>
+<h2 id="安装HEXO"><a href="#安装HEXO" class="headerlink" title="安装HEXO"></a>安装HEXO</h2><ol>
+<li>哈哈！！！终于到这一步了，其实这一步很简单，因为前面的安装好了这里用npm会非常简单哦。</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">npm install -g hexo-cli</div></pre></td></tr></table></figure>
+<ol>
+<li><p>安装完成以后输入 <code>hexo -v</code>出现如下界面则表示Hexo安装成功了:</p>
+ <img src="/2017/04/22/使用github-hexo搭建个人博客/hexofinsh.png" alt="hexofinsh.png" title=""></li>
+<li>接下可以初始化我们的博客了，分别执行下面的命令（有没有很激动呢。。。）</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$ hexo init &lt;folder&gt;</div><div class="line">$ <span class="built_in">cd</span> &lt;folder&gt;</div><div class="line">$ npm install</div></pre></td></tr></table></figure>
+<ol>
+<li>依赖项装完以后可以在本地预览</li>
+<li>首先执行<code>hexo generate</code>生成博客的静态页面</li>
+<li>然后执行<code>hexo server</code>开启本地预览，在浏览器打开 <a href="http://localhost:4000/" target="_blank" rel="external">http://localhost:4000/</a><img src="/2017/04/22/使用github-hexo搭建个人博客/finish.png" alt="finish.png" title="">
+</li>
+</ol>
+<p>哈哈，有没有看到上述页面。到这里博客就创建好了。</p>
+<h2 id="config-yml配置"><a href="#config-yml配置" class="headerlink" title="_config.yml配置"></a>_config.yml配置</h2><p>具体配置请参考<a href="https://hexo.io/zh-cn/docs/configuration.html" title="快点我" target="_blank" rel="external">这里</a></p>
+<h2 id="部署到github"><a href="#部署到github" class="headerlink" title="部署到github"></a>部署到github</h2><ol>
+<li>注册github：部署到github自然需要有一个github账号啦。这个没什么好说的了。</li>
+<li>新建创库，这个用文字表达起来会略显繁琐，所以这里直接上图<img src="/2017/04/22/使用github-hexo搭建个人博客/git_1.png" alt="git_1.png" title="">
+<img src="/2017/04/22/使用github-hexo搭建个人博客/git_2.png" alt="git_2.png" title=""></li>
+<li><p>创建好仓库以后，我们需要打开_config.yml文件，添加如下内容</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">type: git</div><div class="line">repository: https://github.com/yourname/yourname.github.io</div><div class="line">branch: master</div></pre></td></tr></table></figure>
+</li>
+<li><p>现在就差最后一步就可以部署到github了（很激动有没有，博客终于可以上线了，哈哈。。。）。now，执行下面的命令<code>$ npm install hexo-deployer-git --save</code>。最后一步部署命令<code>$ hexo deploy</code>。</p>
+</li>
+<li>到这里本教程就完成了。赶紧打开浏览器输入<a href="http://yourgitname.gihub.io" target="_blank" rel="external">http://yourgitname.gihub.io</a> 看看你的成果吧。<br>ps：第一次用MarkDown来写博客，写的不好莫怪哈。有错请指正。</li>
+</ol>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;概述&quot;&gt;&lt;a href=&quot;#概述&quot; class=&quot;headerlink&quot; title=&quot;概述&quot;&gt;&lt;/a&gt;概述&lt;/h2&gt;&lt;p&gt;　　这个是本站的第一篇文章，我们该写点什么呢？很简单我们就写下本站是怎么搭建的吧。我们需要用到的框架是&lt;a href=&quot;https://hexo.io/&quot; title=&quot;详情&quot;&gt;HEXO&lt;/a&gt;： 是一个快速、简洁且高效的博客框架。Hexo 使用 Markdown（或其他渲染引擎）解析文章，在几秒内，即可利用靓丽的主题生成静态网页。&lt;br&gt;
+    
+    </summary>
+    
+      <category term="HEXO" scheme="http://metoor.github.io/categories/HEXO/"/>
+    
+    
+      <category term="HEXO" scheme="http://metoor.github.io/tags/HEXO/"/>
+    
+      <category term="blog" scheme="http://metoor.github.io/tags/blog/"/>
+    
+  </entry>
+  
+</feed>
