@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://metoor.github.io/"/>
-  <updated>2017-04-22T14:57:00.494Z</updated>
+  <updated>2017-08-03T12:59:10.244Z</updated>
   <id>http://metoor.github.io/</id>
   
   <author>
@@ -14,6 +14,51 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>a*寻路算法总结</title>
+    <link href="http://metoor.github.io/2017/08/03/thinking-about-a-star-algorithm/"/>
+    <id>http://metoor.github.io/2017/08/03/thinking-about-a-star-algorithm/</id>
+    <published>2017-08-03T12:16:15.000Z</published>
+    <updated>2017-08-03T12:59:10.244Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>最近想做一个<a href="https://baike.baidu.com/item/%E8%A7%92%E8%89%B2%E6%89%AE%E6%BC%94%E6%B8%B8%E6%88%8F/1730573?fr=aladdin&amp;fromid=24462&amp;fromtitle=rpg" title="点我了解详情" target="_blank" rel="external">RPG</a>类型的游戏，对于RPG游戏而言寻路算法是非常必要的。现在将它记在博客以便日后复习。这里只是一个简单的实现，等空下来会用二叉堆（<a href="http://blog.csdn.net/zxz414644665/article/details/15337107" title="点我了解详情" target="_blank" rel="external">Binary Heaps</a>）来实现。<br><a id="more"></a><br>在计算机科学中，A*算法广泛应用于寻路和图的遍历。最早是于1968年，由Peter Hart, Nils Nilsson 和Bertram Raphael3人在斯坦福研究院描述了 该算法。是对Dijkstra算法的一种扩展。是一种高效的搜索算法。</p>
+<p>这是个比较常用的算法，游戏中的寻路通常会使用这个算法，在理解这个算法之前，先明白几个概念：</p>
+<h2 id="搜索区域（The-Search-Area）"><a href="#搜索区域（The-Search-Area）" class="headerlink" title="搜索区域（The Search Area）"></a>搜索区域（The Search Area）</h2><p>搜索区域可以划分为正方形格子，但不限于此，六边形，矩形，平行四边形都可以。因此他们的中心点通常称为节点(Node)，而不是方格(Squares)。</p>
+<p>##路径排序(Path Sorting)</p>
+<p>在没有任何障碍的地图上，一个节点可以有4个方向甚至8个方向移动可能。那么如何选择走那个路径呢，判断的依据就是这个公式：<br>f = g + h;</p>
+<p>g是起点到指定格子的移动代价，h是指定格子到达终点的估算成本，f值则是两者之和。</p>
+<p>假设横纵走一格的代价为10， 对角线为14，那么起点往左走一格的g值为10。 </p>
+<h2 id="启发函数（Heuristics-function）"><a href="#启发函数（Heuristics-function）" class="headerlink" title="启发函数（Heuristics function）"></a>启发函数（Heuristics function）</h2><p>h值属于估算成本，不同的估算方法对应不同的结果。选取适合的估算方法需要根据实际场景而定。我们成这种估算函数为启发函数，例如，允许4个方向走，那么可以采用曼哈顿距离（Manhattan distance）， 即横向和竖向走到终点的距离之和。启发函数的作用在于，当你把启发代价设定的比实际代价更大时，那么搜索速度会变得更快，但结果可能不是最优的路径。相反，<br>启发代价比实际的小，那么搜索变慢，得到一个最优路径。这是速度 与最优解之间的权衡</p>
+<p>开放列表(Open List)<br>开放列表实际上是一个待检测的格子列表，对应的，我们把检测过的格子放入Close List中。</p>
+<p>以上是A<em>的关键点，尤其是启发函数，如果没有启发函数，则A</em>就退化成了Dijkstra算法，是运行效率重要还是找到最佳路径重要，全靠启发函数来调节，因此也被归为启发式算法。</p>
+<h2 id="A-算法的具体步骤："><a href="#A-算法的具体步骤：" class="headerlink" title="A*算法的具体步骤："></a>A*算法的具体步骤：</h2><ol>
+<li>把起点加入 open list 。</li>
+<li>重复如下过程：</li>
+<li>遍历 open list ，查找 F 值最小的节点，把它作为当前要处理的节点。</li>
+<li>把这个节点移到 close list 。</li>
+<li>对当前方格的 8 个相邻方格的每一个方格？<br>(1). 如果它是不可抵达的或者它在 close list 中，忽略它。否则，做如下操作。<br>(2). 如果它不在 open list 中，把它加入 open list ，并且把当前方格设置为它的父亲，记录该方格的 F ， G 和 H 值。<br>(3). 如果它已经在 open list 中，检查这条路径 ( 即经由当前方格到达它那里 ) 是否更好，用 G 值作参考。更小的 G 值表示这是更好的路径。如果是这样，把它的父亲设置为当前方格，并重新计算它的 G 和 F 值。如果你的 open list 是按 F 值排序的话，改变后你可能需要重新排序。</li>
+<li>停止，当你<br>(1). 把终点加入到了 open list 中，此时路径已经找到了<br>(2). 查找终点失败，并且 open list 是空的，此时没有路径。</li>
+<li>保存路径。从终点开始，每个方格沿着父节点移动直至起点，这就是你的路径。<h2 id="程序运行截图"><a href="#程序运行截图" class="headerlink" title="程序运行截图"></a>程序运行截图</h2><img src="/2017/08/03/thinking-about-a-star-algorithm/demoScreenShoot.png" alt="demoScreenShoot.png" title="">
+</li>
+</ol>
+<p>好了，就讲到这里了。程序源码<a href="https://github.com/metoor/astar" title="Metoor&#39;s github" target="_blank" rel="external">点我查看</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;概述&quot;&gt;&lt;a href=&quot;#概述&quot; class=&quot;headerlink&quot; title=&quot;概述&quot;&gt;&lt;/a&gt;概述&lt;/h2&gt;&lt;p&gt;最近想做一个&lt;a href=&quot;https://baike.baidu.com/item/%E8%A7%92%E8%89%B2%E6%89%AE%E6%BC%94%E6%B8%B8%E6%88%8F/1730573?fr=aladdin&amp;amp;fromid=24462&amp;amp;fromtitle=rpg&quot; title=&quot;点我了解详情&quot;&gt;RPG&lt;/a&gt;类型的游戏，对于RPG游戏而言寻路算法是非常必要的。现在将它记在博客以便日后复习。这里只是一个简单的实现，等空下来会用二叉堆（&lt;a href=&quot;http://blog.csdn.net/zxz414644665/article/details/15337107&quot; title=&quot;点我了解详情&quot;&gt;Binary Heaps&lt;/a&gt;）来实现。&lt;br&gt;
+    
+    </summary>
+    
+      <category term="algorithm" scheme="http://metoor.github.io/categories/algorithm/"/>
+    
+    
+      <category term="node.js" scheme="http://metoor.github.io/tags/node-js/"/>
+    
+      <category term="a*" scheme="http://metoor.github.io/tags/a/"/>
+    
+  </entry>
   
   <entry>
     <title>使用github+hexo搭建个人博客</title>

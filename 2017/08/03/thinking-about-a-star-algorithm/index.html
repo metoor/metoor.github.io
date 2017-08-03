@@ -92,12 +92,10 @@
 <link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Metoor, blog" />
+  <meta name="keywords" content="node.js,a*," />
 
 
 
-
-  
 
 
   <link rel="alternate" href="/atom.xml" title="Metoor" type="application/atom+xml" />
@@ -112,16 +110,19 @@
 
 
 
-<meta name="description" content="Every accomplishment starts with the decision to try.">
-<meta property="og:type" content="website">
-<meta property="og:title" content="about">
-<meta property="og:url" content="http://metoor.github.io/about/index.html">
+<meta name="description" content="概述最近想做一个RPG类型的游戏，对于RPG游戏而言寻路算法是非常必要的。现在将它记在博客以便日后复习。这里只是一个简单的实现，等空下来会用二叉堆（Binary Heaps）来实现。">
+<meta name="keywords" content="node.js,a*">
+<meta property="og:type" content="article">
+<meta property="og:title" content="a*寻路算法总结">
+<meta property="og:url" content="http://metoor.github.io/2017/08/03/thinking-about-a-star-algorithm/index.html">
 <meta property="og:site_name" content="Metoor">
-<meta property="og:description" content="Every accomplishment starts with the decision to try.">
-<meta property="og:updated_time" content="2017-04-21T15:35:39.809Z">
+<meta property="og:description" content="概述最近想做一个RPG类型的游戏，对于RPG游戏而言寻路算法是非常必要的。现在将它记在博客以便日后复习。这里只是一个简单的实现，等空下来会用二叉堆（Binary Heaps）来实现。">
+<meta property="og:image" content="http://metoor.github.io/2017/08/03/thinking-about-a-star-algorithm/demoScreenShoot.png">
+<meta property="og:updated_time" content="2017-08-03T12:59:10.244Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="about">
-<meta name="twitter:description" content="Every accomplishment starts with the decision to try.">
+<meta name="twitter:title" content="a*寻路算法总结">
+<meta name="twitter:description" content="概述最近想做一个RPG类型的游戏，对于RPG游戏而言寻路算法是非常必要的。现在将它记在博客以便日后复习。这里只是一个简单的实现，等空下来会用二叉堆（Binary Heaps）来实现。">
+<meta name="twitter:image" content="http://metoor.github.io/2017/08/03/thinking-about-a-star-algorithm/demoScreenShoot.png">
 
 
 
@@ -149,19 +150,13 @@
 
 
 
-  <link rel="canonical" href="http://metoor.github.io/about/"/>
+  <link rel="canonical" href="http://metoor.github.io/2017/08/03/thinking-about-a-star-algorithm/"/>
 
 
 
 
 
-  <title>
-  
-
-  
-    about | Metoor
-  
-</title>
+  <title> a*寻路算法总结 | Metoor </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="en">
@@ -196,7 +191,7 @@
     
   
 
-  <div class="container sidebar-position-left  ">
+  <div class="container sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -335,18 +330,209 @@
             
 
   <div id="posts" class="posts-expand">
-  <header class="post-header">
+    
 
-	<h1 class="post-title" itemprop="name headline">about</h1>
+  
 
+  
+  
+  
 
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://metoor.github.io/2017/08/03/thinking-about-a-star-algorithm/">
 
-</header>
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Metoor">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Metoor">
+    </span>
 
     
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                a*寻路算法总结
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-03T20:16:15+08:00">
+                2017-08-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/algorithm/" itemprop="url" rel="index">
+                    <span itemprop="name">algorithm</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            <!--noindex-->
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/08/03/thinking-about-a-star-algorithm/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count hc-comment-count" data-xid="2017/08/03/thinking-about-a-star-algorithm/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+              <!--/noindex-->
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
     
+
+    <div class="post-body" itemprop="articleBody">
+
       
-    
+      
+
+      
+        <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>最近想做一个<a href="https://baike.baidu.com/item/%E8%A7%92%E8%89%B2%E6%89%AE%E6%BC%94%E6%B8%B8%E6%88%8F/1730573?fr=aladdin&amp;fromid=24462&amp;fromtitle=rpg" title="点我了解详情" target="_blank" rel="external">RPG</a>类型的游戏，对于RPG游戏而言寻路算法是非常必要的。现在将它记在博客以便日后复习。这里只是一个简单的实现，等空下来会用二叉堆（<a href="http://blog.csdn.net/zxz414644665/article/details/15337107" title="点我了解详情" target="_blank" rel="external">Binary Heaps</a>）来实现。<br><a id="more"></a><br>在计算机科学中，A*算法广泛应用于寻路和图的遍历。最早是于1968年，由Peter Hart, Nils Nilsson 和Bertram Raphael3人在斯坦福研究院描述了 该算法。是对Dijkstra算法的一种扩展。是一种高效的搜索算法。</p>
+<p>这是个比较常用的算法，游戏中的寻路通常会使用这个算法，在理解这个算法之前，先明白几个概念：</p>
+<h2 id="搜索区域（The-Search-Area）"><a href="#搜索区域（The-Search-Area）" class="headerlink" title="搜索区域（The Search Area）"></a>搜索区域（The Search Area）</h2><p>搜索区域可以划分为正方形格子，但不限于此，六边形，矩形，平行四边形都可以。因此他们的中心点通常称为节点(Node)，而不是方格(Squares)。</p>
+<p>##路径排序(Path Sorting)</p>
+<p>在没有任何障碍的地图上，一个节点可以有4个方向甚至8个方向移动可能。那么如何选择走那个路径呢，判断的依据就是这个公式：<br>f = g + h;</p>
+<p>g是起点到指定格子的移动代价，h是指定格子到达终点的估算成本，f值则是两者之和。</p>
+<p>假设横纵走一格的代价为10， 对角线为14，那么起点往左走一格的g值为10。 </p>
+<h2 id="启发函数（Heuristics-function）"><a href="#启发函数（Heuristics-function）" class="headerlink" title="启发函数（Heuristics function）"></a>启发函数（Heuristics function）</h2><p>h值属于估算成本，不同的估算方法对应不同的结果。选取适合的估算方法需要根据实际场景而定。我们成这种估算函数为启发函数，例如，允许4个方向走，那么可以采用曼哈顿距离（Manhattan distance）， 即横向和竖向走到终点的距离之和。启发函数的作用在于，当你把启发代价设定的比实际代价更大时，那么搜索速度会变得更快，但结果可能不是最优的路径。相反，<br>启发代价比实际的小，那么搜索变慢，得到一个最优路径。这是速度 与最优解之间的权衡</p>
+<p>开放列表(Open List)<br>开放列表实际上是一个待检测的格子列表，对应的，我们把检测过的格子放入Close List中。</p>
+<p>以上是A<em>的关键点，尤其是启发函数，如果没有启发函数，则A</em>就退化成了Dijkstra算法，是运行效率重要还是找到最佳路径重要，全靠启发函数来调节，因此也被归为启发式算法。</p>
+<h2 id="A-算法的具体步骤："><a href="#A-算法的具体步骤：" class="headerlink" title="A*算法的具体步骤："></a>A*算法的具体步骤：</h2><ol>
+<li>把起点加入 open list 。</li>
+<li>重复如下过程：</li>
+<li>遍历 open list ，查找 F 值最小的节点，把它作为当前要处理的节点。</li>
+<li>把这个节点移到 close list 。</li>
+<li>对当前方格的 8 个相邻方格的每一个方格？<br>(1). 如果它是不可抵达的或者它在 close list 中，忽略它。否则，做如下操作。<br>(2). 如果它不在 open list 中，把它加入 open list ，并且把当前方格设置为它的父亲，记录该方格的 F ， G 和 H 值。<br>(3). 如果它已经在 open list 中，检查这条路径 ( 即经由当前方格到达它那里 ) 是否更好，用 G 值作参考。更小的 G 值表示这是更好的路径。如果是这样，把它的父亲设置为当前方格，并重新计算它的 G 和 F 值。如果你的 open list 是按 F 值排序的话，改变后你可能需要重新排序。</li>
+<li>停止，当你<br>(1). 把终点加入到了 open list 中，此时路径已经找到了<br>(2). 查找终点失败，并且 open list 是空的，此时没有路径。</li>
+<li>保存路径。从终点开始，每个方格沿着父节点移动直至起点，这就是你的路径。<h2 id="程序运行截图"><a href="#程序运行截图" class="headerlink" title="程序运行截图"></a>程序运行截图</h2><img src="/2017/08/03/thinking-about-a-star-algorithm/demoScreenShoot.png" alt="demoScreenShoot.png" title="">
+</li>
+</ol>
+<p>好了，就讲到这里了。程序源码<a href="https://github.com/metoor/astar" title="Metoor&#39;s github" target="_blank" rel="external">点我查看</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/node-js/" rel="tag"># node.js</a>
+          
+            <a href="/tags/a/" rel="tag"># a*</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/04/22/use-github-and-hexo-build-blog/" rel="prev" title="使用github+hexo搭建个人博客">
+                使用github+hexo搭建个人博客 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
   </div>
 
 
@@ -355,6 +541,12 @@
 
 
           
+  <div class="comments" id="comments">
+    
+      <div id="hypercomments_widget"></div>
+    
+  </div>
+
 
         </div>
         
@@ -374,8 +566,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.jpg"
@@ -464,6 +665,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#搜索区域（The-Search-Area）"><span class="nav-number">2.</span> <span class="nav-text">搜索区域（The Search Area）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#启发函数（Heuristics-function）"><span class="nav-number">3.</span> <span class="nav-text">启发函数（Heuristics function）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#A-算法的具体步骤："><span class="nav-number">4.</span> <span class="nav-text">A*算法的具体步骤：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#程序运行截图"><span class="nav-number">5.</span> <span class="nav-text">程序运行截图</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -589,6 +806,10 @@
 
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
 
   
 
@@ -612,6 +833,8 @@
 
 		_hcwp.push({widget:"Bloggerstream", widget_id: 89946, selector:".hc-comment-count", label: "{\%COUNT%\}" });
 
+		
+		_hcwp.push({widget:"Stream", widget_id: 89946, xid: "2017/08/03/thinking-about-a-star-algorithm/"});
 		
 
 		(function() {
