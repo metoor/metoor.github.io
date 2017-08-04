@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://metoor.github.io/"/>
-  <updated>2017-08-03T12:59:10.244Z</updated>
+  <updated>2017-08-04T12:51:05.299Z</updated>
   <id>http://metoor.github.io/</id>
   
   <author>
@@ -14,6 +14,63 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>使用cocos studio制作动画</title>
+    <link href="http://metoor.github.io/2017/08/04/using-cocos-studio-animation/"/>
+    <id>http://metoor.github.io/2017/08/04/using-cocos-studio-animation/</id>
+    <published>2017-08-04T12:46:02.000Z</published>
+    <updated>2017-08-04T12:51:05.299Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>虽然触控不维护cocos studio了，但是很多人却还在使用着，比如我们公司就还用着，因为需要做动画。但是我不会，只会代码去写动画，太费时间了有没有啊，所以就决定去哪就下怎么用编辑器去做动画了。现在把过程记录下来，以便日后复习。<br><a id="more"></a></p>
+<h2 id="动画只是简单的移动、旋转淡入淡出等简单的动画，创建步奏如下："><a href="#动画只是简单的移动、旋转淡入淡出等简单的动画，创建步奏如下：" class="headerlink" title="动画只是简单的移动、旋转淡入淡出等简单的动画，创建步奏如下："></a>动画只是简单的移动、旋转淡入淡出等简单的动画，创建步奏如下：</h2><ol>
+<li>首先新建一个节点，见下图：<img src="/2017/08/04/using-cocos-studio-animation/1.png" alt="1.png" title="">
+<img src="/2017/08/04/using-cocos-studio-animation/2.png" alt="2.png" title=""></li>
+<li>拖一个Text控件到我们刚创建的节点上面。然后我们就可切入正题开始做动画了。</li>
+<li>点击“+”号创建一个动画<img src="/2017/08/04/using-cocos-studio-animation/3.png" alt="3.png" title="">
+点击“+”后会弹出一个对话框，如下<img src="/2017/08/04/using-cocos-studio-animation/4.png" alt="4.png" title=""></li>
+<li>动画创建好了，我们可以开始编辑动画了。这里我们使用自动记录动画的功能这样比较方便。按钮在这里啦<img src="/2017/08/04/using-cocos-studio-animation/5.png" alt="5.png" title="">
+选择“开始记录动画”以后我们就可以开始编辑动画效果了。这里我们就让文字旋转360°吧。<br>（1）首先第一帧不用管，直接插入关键帧就好了。<br>（2）将插入位置移动到下一帧，然后修改旋转属性为“90°”<img src="/2017/08/04/using-cocos-studio-animation/6.png" alt="6.png" title="">
+重复循环这一步骤，直到Text文字变换回到开始位置（0°）</li>
+<li>取消勾选“开始记录动画”，到这里旋转动画就完成了。我们可以点击播放按钮看看效果。<img src="/2017/08/04/using-cocos-studio-animation/7.png" alt="7.png" title=""></li>
+<li>有人肯定会问，那我们开始创建动画的时候填的名字有什么用呢。哈哈，不用急我的理解是当我们有多个动画的时候，名字就可以派上用场了。举个例子，有个角色有三个动画分别是“run”、“walk”和“attack”。我们在制作的时候就可以这么去做了。<br>（1）0-20帧我们制作“run”的动画，动画的名字就叫做“run”。<br>（2）25-45帧我们制作“walk”的动画，动画的名字就叫做“walk”。<br>（2）50-70帧我们制作“attack”的动画，动画的名字就叫做“attack”。<br>聪明的你是不是已经明白一切了。就是你想的那样。我们在代码中可以通过名字来播放相应的动画。是不是比用帧去播放容易记点呢。</li>
+</ol>
+<h2 id="用图片制作动画"><a href="#用图片制作动画" class="headerlink" title="用图片制作动画"></a>用图片制作动画</h2><ol>
+<li>很简单导入资源，你只需要选择好你需要的资源，然后把它拖入到cocos studio左下角的项目窗口就可以了。<br>2.创建一个新的节点，然后在节点上新创建一个精灵。 </li>
+<li>在项目选择你需要的资源直接拖到我们刚创建的精灵上。好了大工告成，是不是很简单呢？<img src="/2017/08/04/using-cocos-studio-animation/jdfw.gif" alt="jdfw.gif" title="">
+</li>
+</ol>
+<h2 id="发布资源"><a href="#发布资源" class="headerlink" title="发布资源"></a>发布资源</h2><ol>
+<li>在发布资源之前记得把我们创建的两个节点放到场景中去。<img src="/2017/08/04/using-cocos-studio-animation/9.png" alt="9.png" title=""></li>
+<li>当编辑好了动画就可以发布了。因为们这里没有有新建vs工程所以这里我选择发布vs工程，然后并打开它。<img src="/2017/08/04/using-cocos-studio-animation/8.png" alt="8.png" title="">
+</li>
+</ol>
+<h2 id="代码播放动画"><a href="#代码播放动画" class="headerlink" title="代码播放动画"></a>代码播放动画</h2><ol>
+<li><p>在<code>HelloWorld::init()</code>中添加如下代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">ActionTimeline* action1 = CSLoader::createTimeline(<span class="string">"spite1.csb"</span>);</div><div class="line">rootNode-&gt;getChildByName&lt;ui::Text*&gt;(<span class="string">"sprite1"</span>)-&gt;runAction(action1);</div><div class="line"></div><div class="line">ActionTimeline* action2 = CSLoader::createTimeline(<span class="string">"spite2.csb"</span>);</div><div class="line">rootNode-&gt;getChildByName&lt;Sprite*&gt;(<span class="string">"sprite2"</span>)-&gt;runAction(action2);</div><div class="line">action1-&gt;gotoFrameAndPlay(<span class="number">0</span>, <span class="literal">true</span>);</div><div class="line"></div><div class="line"><span class="comment">//action1-&gt;play("ani2",true);</span></div><div class="line">action2-&gt;gotoFrameAndPlay(<span class="number">0</span>, <span class="literal">true</span>);</div></pre></td></tr></table></figure>
+</li>
+<li><p>好了，到现在为止，本教程就全部讲完了，按下<code>F5</code>看看效果吧。下面是我的效果：</p>
+<img src="/2017/08/04/using-cocos-studio-animation/runScreen.gif" alt="runScreen.gif" title="">
+</li>
+</ol>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;概述&quot;&gt;&lt;a href=&quot;#概述&quot; class=&quot;headerlink&quot; title=&quot;概述&quot;&gt;&lt;/a&gt;概述&lt;/h2&gt;&lt;p&gt;虽然触控不维护cocos studio了，但是很多人却还在使用着，比如我们公司就还用着，因为需要做动画。但是我不会，只会代码去写动画，太费时间了有没有啊，所以就决定去哪就下怎么用编辑器去做动画了。现在把过程记录下来，以便日后复习。&lt;br&gt;
+    
+    </summary>
+    
+      <category term="cocos2dx" scheme="http://metoor.github.io/categories/cocos2dx/"/>
+    
+    
+      <category term="cocos studio" scheme="http://metoor.github.io/tags/cocos-studio/"/>
+    
+      <category term="cocos2dx" scheme="http://metoor.github.io/tags/cocos2dx/"/>
+    
+      <category term="animation" scheme="http://metoor.github.io/tags/animation/"/>
+    
+  </entry>
   
   <entry>
     <title>a*寻路算法总结</title>
