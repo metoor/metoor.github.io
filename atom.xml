@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://metoor.github.io/"/>
-  <updated>2017-08-04T12:51:05.299Z</updated>
+  <updated>2017-08-05T09:12:14.332Z</updated>
   <id>http://metoor.github.io/</id>
   
   <author>
@@ -16,13 +16,46 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>教你轻松观看各大视频网站的VIP视频</title>
+    <link href="http://metoor.github.io/2017/08/05/using-tampermonkey/"/>
+    <id>http://metoor.github.io/2017/08/05/using-tampermonkey/</id>
+    <published>2017-08-05T08:10:03.000Z</published>
+    <updated>2017-08-05T09:12:14.332Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>今天发现一个不错的Vip视频解析脚本。基本支持主流的视频网站（优酷、腾讯、乐视、爱奇艺…）清晰度也还不错。这都得益于tampermonkey这个插件，插件的功能远不止这么简单哈，更多玩法就等你们自己去发掘了。现在就推荐给大家了。我这里只讲解chrom 浏览器的安装过程。其他的浏览器也类似就不一一细说了。<br><a id="more"></a></p>
+<h2 id="安装tampermonkey"><a href="#安装tampermonkey" class="headerlink" title="安装tampermonkey"></a>安装tampermonkey</h2><ol>
+<li>假如你可以上google可以使用这种方法<br><a href="http://tampermonkey.net/" title="点我去下载页" target="_blank" rel="external">tampermonkey</a><img src="/2017/08/05/using-tampermonkey/1.png" alt="1.png" title="">
+点击或会调到chrome应用商店，点击添加到chrome就可以了<img src="/2017/08/05/using-tampermonkey/2.png" alt="2.png" title=""></li>
+<li>不出去的话也没有关系，这里提供百度网盘下载：<br>链接：<a href="http://pan.baidu.com/s/1slEyGVz" target="_blank" rel="external">http://pan.baidu.com/s/1slEyGVz</a> 密码：ubgj<br>啥，你说你不会离线安装chrome插件，好吧。好人做到底。<br>首先你需要打开chrome的扩展程序。<img src="/2017/08/05/using-tampermonkey/3.png" alt="3.png" title="">
+打开扩展程序页面以后，你只需要把下载好的<code>Tampermonkey.crx</code>拖入到扩展程序页面就可以了。如果还不会的就百度“chrome怎么安装插件”。<h2 id="安装视频解析脚本"><a href="#安装视频解析脚本" class="headerlink" title="安装视频解析脚本"></a>安装视频解析脚本</h2>到这里我认为你已经成功装好tampermonkey插件。现在就可以装脚本了</li>
+</ol>
+<ul>
+<li><a href="https://greasyfork.org/zh-CN/scripts/27530-%E7%A0%B4%E8%A7%A3vip%E4%BC%9A%E5%91%98%E8%A7%86%E9%A2%91%E9%9B%86%E5%90%88" title="你在犹豫什么呢..." target="_blank" rel="external">点我去脚本下载页</a><br>打开后你会看到如下页面：<img src="/2017/08/05/using-tampermonkey/4.png" alt="4.png" title="">
+安装好了不要急着，把网页关掉，具体的使用教程请参考脚本安装也介绍，这里就不多说了。好了就说到这里了，如果有问题可以留言。观影愉快，哈哈！<br>放一张优酷解析出来的资源（逆时空营救）。<img src="/2017/08/05/using-tampermonkey/5.png" alt="5.png" title=""></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;概述&quot;&gt;&lt;a href=&quot;#概述&quot; class=&quot;headerlink&quot; title=&quot;概述&quot;&gt;&lt;/a&gt;概述&lt;/h2&gt;&lt;p&gt;今天发现一个不错的Vip视频解析脚本。基本支持主流的视频网站（优酷、腾讯、乐视、爱奇艺…）清晰度也还不错。这都得益于tampermonkey这个插件，插件的功能远不止这么简单哈，更多玩法就等你们自己去发掘了。现在就推荐给大家了。我这里只讲解chrom 浏览器的安装过程。其他的浏览器也类似就不一一细说了。&lt;br&gt;
+    
+    </summary>
+    
+      <category term="life" scheme="http://metoor.github.io/categories/life/"/>
+    
+    
+      <category term="tampermonkey" scheme="http://metoor.github.io/tags/tampermonkey/"/>
+    
+  </entry>
+  
+  <entry>
     <title>使用cocos studio制作动画</title>
     <link href="http://metoor.github.io/2017/08/04/using-cocos-studio-animation/"/>
     <id>http://metoor.github.io/2017/08/04/using-cocos-studio-animation/</id>
     <published>2017-08-04T12:46:02.000Z</published>
-    <updated>2017-08-04T12:51:05.299Z</updated>
+    <updated>2017-08-05T09:01:35.078Z</updated>
     
-    <content type="html"><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>虽然触控不维护cocos studio了，但是很多人却还在使用着，比如我们公司就还用着，因为需要做动画。但是我不会，只会代码去写动画，太费时间了有没有啊，所以就决定去哪就下怎么用编辑器去做动画了。现在把过程记录下来，以便日后复习。<br><a id="more"></a></p>
+    <content type="html"><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>虽然触控不维护cocos studio了，但是很多人却还在使用着，比如我们公司就还用着，因为需要做动画。但是我不会，只会代码去写动画，太费时间了有没有啊，所以就决定去研究下怎么用编辑器去做动画了。现在把过程记录下来，以便日后复习。<br><a id="more"></a></p>
 <h2 id="动画只是简单的移动、旋转淡入淡出等简单的动画，创建步奏如下："><a href="#动画只是简单的移动、旋转淡入淡出等简单的动画，创建步奏如下：" class="headerlink" title="动画只是简单的移动、旋转淡入淡出等简单的动画，创建步奏如下："></a>动画只是简单的移动、旋转淡入淡出等简单的动画，创建步奏如下：</h2><ol>
 <li>首先新建一个节点，见下图：<img src="/2017/08/04/using-cocos-studio-animation/1.png" alt="1.png" title="">
 <img src="/2017/08/04/using-cocos-studio-animation/2.png" alt="2.png" title=""></li>
@@ -57,7 +90,7 @@
     
     <summary type="html">
     
-      &lt;h2 id=&quot;概述&quot;&gt;&lt;a href=&quot;#概述&quot; class=&quot;headerlink&quot; title=&quot;概述&quot;&gt;&lt;/a&gt;概述&lt;/h2&gt;&lt;p&gt;虽然触控不维护cocos studio了，但是很多人却还在使用着，比如我们公司就还用着，因为需要做动画。但是我不会，只会代码去写动画，太费时间了有没有啊，所以就决定去哪就下怎么用编辑器去做动画了。现在把过程记录下来，以便日后复习。&lt;br&gt;
+      &lt;h2 id=&quot;概述&quot;&gt;&lt;a href=&quot;#概述&quot; class=&quot;headerlink&quot; title=&quot;概述&quot;&gt;&lt;/a&gt;概述&lt;/h2&gt;&lt;p&gt;虽然触控不维护cocos studio了，但是很多人却还在使用着，比如我们公司就还用着，因为需要做动画。但是我不会，只会代码去写动画，太费时间了有没有啊，所以就决定去研究下怎么用编辑器去做动画了。现在把过程记录下来，以便日后复习。&lt;br&gt;
     
     </summary>
     
