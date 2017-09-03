@@ -117,12 +117,15 @@
 <meta property="og:url" content="http://metoor.github.io/2017/08/03/thinking-about-a-star-algorithm/index.html">
 <meta property="og:site_name" content="Metoor">
 <meta property="og:description" content="概述最近想做一个RPG类型的游戏，对于RPG游戏而言寻路算法是非常必要的。现在将它记在博客以便日后复习。这里只是一个简单的实现，等空下来会用二叉堆（Binary Heaps）来实现。">
+<meta property="og:image" content="http://metoor.github.io/2017/08/03/thinking-about-a-star-algorithm/0.png">
+<meta property="og:image" content="http://metoor.github.io/2017/08/03/thinking-about-a-star-algorithm/1.png">
+<meta property="og:image" content="http://metoor.github.io/2017/08/03/thinking-about-a-star-algorithm/2.png">
 <meta property="og:image" content="http://metoor.github.io/2017/08/03/thinking-about-a-star-algorithm/demoScreenShoot.png">
-<meta property="og:updated_time" content="2017-08-03T12:59:10.244Z">
+<meta property="og:updated_time" content="2017-09-03T08:59:58.803Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="a*寻路算法总结">
 <meta name="twitter:description" content="概述最近想做一个RPG类型的游戏，对于RPG游戏而言寻路算法是非常必要的。现在将它记在博客以便日后复习。这里只是一个简单的实现，等空下来会用二叉堆（Binary Heaps）来实现。">
-<meta name="twitter:image" content="http://metoor.github.io/2017/08/03/thinking-about-a-star-algorithm/demoScreenShoot.png">
+<meta name="twitter:image" content="http://metoor.github.io/2017/08/03/thinking-about-a-star-algorithm/0.png">
 
 
 
@@ -461,9 +464,20 @@
 <li>把这个节点移到 close list 。</li>
 <li>对当前方格的 8 个相邻方格的每一个方格？<br>(1). 如果它是不可抵达的或者它在 close list 中，忽略它。否则，做如下操作。<br>(2). 如果它不在 open list 中，把它加入 open list ，并且把当前方格设置为它的父亲，记录该方格的 F ， G 和 H 值。<br>(3). 如果它已经在 open list 中，检查这条路径 ( 即经由当前方格到达它那里 ) 是否更好，用 G 值作参考。更小的 G 值表示这是更好的路径。如果是这样，把它的父亲设置为当前方格，并重新计算它的 G 和 F 值。如果你的 open list 是按 F 值排序的话，改变后你可能需要重新排序。</li>
 <li>停止，当你<br>(1). 把终点加入到了 open list 中，此时路径已经找到了<br>(2). 查找终点失败，并且 open list 是空的，此时没有路径。</li>
-<li>保存路径。从终点开始，每个方格沿着父节点移动直至起点，这就是你的路径。<h2 id="程序运行截图"><a href="#程序运行截图" class="headerlink" title="程序运行截图"></a>程序运行截图</h2><img src="/2017/08/03/thinking-about-a-star-algorithm/demoScreenShoot.png" alt="demoScreenShoot.png" title="">
-</li>
+<li>保存路径。从终点开始，每个方格沿着父节点移动直至起点，这就是你的路径。</li>
 </ol>
+<h2 id="使用最小二叉堆优化算法"><a href="#使用最小二叉堆优化算法" class="headerlink" title="使用最小二叉堆优化算法"></a>使用最小二叉堆优化算法</h2><ol>
+<li>当一棵二叉树的每个结点都大于它的两个子结点时，被称为堆有序；<img src="/2017/08/03/thinking-about-a-star-algorithm/0.png" alt="0.png" title=""></li>
+<li>叉堆有两种：最大堆和最小堆。<br>最大堆：父结点的键值总是大于或等于任何一个子结点的键值；<br>最小堆：父结点的键值总是小于或等于任何一个子节点的键值。<br>二叉堆一般都通过”数组”来实现。数组实现的二叉堆，父节点和子节点的位置存在一定的关系。我们将”二叉堆的第一个元素”放在数组索引0的位置。<br>假设”第一个元素”在数组中的索引为 0 的话，则父节点和子节点的位置关系如下： </li>
+</ol>
+<ul>
+<li>索引为i的左孩子的索引是 (2*i+1); </li>
+<li>索引为i的左孩子的索引是 (2*i+2); </li>
+<li>索引为i的父结点的索引是 floor((i-1)/2);<br>当插入一个新的节点的时候怎么保持二叉堆任然有序呢？<img src="/2017/08/03/thinking-about-a-star-algorithm/1.png" alt="1.png" title="">
+假设要在这个二叉堆里入队一个单元，只要在数组末尾加入这个元素，然后把这个元素往上挪，直到挪不动，经过了这种复杂度为Ο(logn)的操作，二叉堆性质没有变化。<br>当删除节点的时候又该怎样保持二叉堆任然有序呢？<img src="/2017/08/03/thinking-about-a-star-algorithm/2.png" alt="2.png" title="">
+</li>
+</ul>
+<h2 id="程序运行截图"><a href="#程序运行截图" class="headerlink" title="程序运行截图"></a>程序运行截图</h2><img src="/2017/08/03/thinking-about-a-star-algorithm/demoScreenShoot.png" alt="demoScreenShoot.png" title="">
 <p>好了，就讲到这里了。程序源码<a href="https://github.com/metoor/astar" title="Metoor&#39;s github" target="_blank" rel="external">点我查看</a></p>
 
       
@@ -617,7 +631,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-count">8</span>
                 <span class="site-state-item-name">tags</span>
               </a>
             </div>
@@ -679,7 +693,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#搜索区域（The-Search-Area）"><span class="nav-number">2.</span> <span class="nav-text">搜索区域（The Search Area）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#启发函数（Heuristics-function）"><span class="nav-number">3.</span> <span class="nav-text">启发函数（Heuristics function）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#A-算法的具体步骤："><span class="nav-number">4.</span> <span class="nav-text">A*算法的具体步骤：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#程序运行截图"><span class="nav-number">5.</span> <span class="nav-text">程序运行截图</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#搜索区域（The-Search-Area）"><span class="nav-number">2.</span> <span class="nav-text">搜索区域（The Search Area）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#启发函数（Heuristics-function）"><span class="nav-number">3.</span> <span class="nav-text">启发函数（Heuristics function）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#A-算法的具体步骤："><span class="nav-number">4.</span> <span class="nav-text">A*算法的具体步骤：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用最小二叉堆优化算法"><span class="nav-number">5.</span> <span class="nav-text">使用最小二叉堆优化算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#程序运行截图"><span class="nav-number">6.</span> <span class="nav-text">程序运行截图</span></a></li></ol></div>
             
 
           </div>

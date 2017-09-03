@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://metoor.github.io/"/>
-  <updated>2017-08-05T09:12:14.332Z</updated>
+  <updated>2017-08-05T09:18:29.000Z</updated>
   <id>http://metoor.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://metoor.github.io/2017/08/05/using-tampermonkey/"/>
     <id>http://metoor.github.io/2017/08/05/using-tampermonkey/</id>
     <published>2017-08-05T08:10:03.000Z</published>
-    <updated>2017-08-05T09:12:14.332Z</updated>
+    <updated>2017-08-05T09:18:29.000Z</updated>
     
     <content type="html"><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>今天发现一个不错的Vip视频解析脚本。基本支持主流的视频网站（优酷、腾讯、乐视、爱奇艺…）清晰度也还不错。这都得益于tampermonkey这个插件，插件的功能远不止这么简单哈，更多玩法就等你们自己去发掘了。现在就推荐给大家了。我这里只讲解chrom 浏览器的安装过程。其他的浏览器也类似就不一一细说了。<br><a id="more"></a></p>
 <h2 id="安装tampermonkey"><a href="#安装tampermonkey" class="headerlink" title="安装tampermonkey"></a>安装tampermonkey</h2><ol>
@@ -31,7 +31,7 @@
 </ol>
 <ul>
 <li><a href="https://greasyfork.org/zh-CN/scripts/27530-%E7%A0%B4%E8%A7%A3vip%E4%BC%9A%E5%91%98%E8%A7%86%E9%A2%91%E9%9B%86%E5%90%88" title="你在犹豫什么呢..." target="_blank" rel="external">点我去脚本下载页</a><br>打开后你会看到如下页面：<img src="/2017/08/05/using-tampermonkey/4.png" alt="4.png" title="">
-安装好了不要急着，把网页关掉，具体的使用教程请参考脚本安装也介绍，这里就不多说了。好了就说到这里了，如果有问题可以留言。观影愉快，哈哈！<br>放一张优酷解析出来的资源（逆时空营救）。<img src="/2017/08/05/using-tampermonkey/5.png" alt="5.png" title=""></li>
+安装好了不要急着，把网页关掉，具体的使用教程请参考脚本安装也介绍，这里就不多说了。好了就说到这里了，如果有问题可以留言。观影愉快，哈哈！<br>放一张优酷解析出来的资源（逆时营救）。<img src="/2017/08/05/using-tampermonkey/5.png" alt="5.png" title=""></li>
 </ul>
 ]]></content>
     
@@ -110,7 +110,7 @@
     <link href="http://metoor.github.io/2017/08/03/thinking-about-a-star-algorithm/"/>
     <id>http://metoor.github.io/2017/08/03/thinking-about-a-star-algorithm/</id>
     <published>2017-08-03T12:16:15.000Z</published>
-    <updated>2017-08-03T12:59:10.244Z</updated>
+    <updated>2017-09-03T08:59:58.803Z</updated>
     
     <content type="html"><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>最近想做一个<a href="https://baike.baidu.com/item/%E8%A7%92%E8%89%B2%E6%89%AE%E6%BC%94%E6%B8%B8%E6%88%8F/1730573?fr=aladdin&amp;fromid=24462&amp;fromtitle=rpg" title="点我了解详情" target="_blank" rel="external">RPG</a>类型的游戏，对于RPG游戏而言寻路算法是非常必要的。现在将它记在博客以便日后复习。这里只是一个简单的实现，等空下来会用二叉堆（<a href="http://blog.csdn.net/zxz414644665/article/details/15337107" title="点我了解详情" target="_blank" rel="external">Binary Heaps</a>）来实现。<br><a id="more"></a><br>在计算机科学中，A*算法广泛应用于寻路和图的遍历。最早是于1968年，由Peter Hart, Nils Nilsson 和Bertram Raphael3人在斯坦福研究院描述了 该算法。是对Dijkstra算法的一种扩展。是一种高效的搜索算法。</p>
 <p>这是个比较常用的算法，游戏中的寻路通常会使用这个算法，在理解这个算法之前，先明白几个概念：</p>
@@ -129,9 +129,20 @@
 <li>把这个节点移到 close list 。</li>
 <li>对当前方格的 8 个相邻方格的每一个方格？<br>(1). 如果它是不可抵达的或者它在 close list 中，忽略它。否则，做如下操作。<br>(2). 如果它不在 open list 中，把它加入 open list ，并且把当前方格设置为它的父亲，记录该方格的 F ， G 和 H 值。<br>(3). 如果它已经在 open list 中，检查这条路径 ( 即经由当前方格到达它那里 ) 是否更好，用 G 值作参考。更小的 G 值表示这是更好的路径。如果是这样，把它的父亲设置为当前方格，并重新计算它的 G 和 F 值。如果你的 open list 是按 F 值排序的话，改变后你可能需要重新排序。</li>
 <li>停止，当你<br>(1). 把终点加入到了 open list 中，此时路径已经找到了<br>(2). 查找终点失败，并且 open list 是空的，此时没有路径。</li>
-<li>保存路径。从终点开始，每个方格沿着父节点移动直至起点，这就是你的路径。<h2 id="程序运行截图"><a href="#程序运行截图" class="headerlink" title="程序运行截图"></a>程序运行截图</h2><img src="/2017/08/03/thinking-about-a-star-algorithm/demoScreenShoot.png" alt="demoScreenShoot.png" title="">
-</li>
+<li>保存路径。从终点开始，每个方格沿着父节点移动直至起点，这就是你的路径。</li>
 </ol>
+<h2 id="使用最小二叉堆优化算法"><a href="#使用最小二叉堆优化算法" class="headerlink" title="使用最小二叉堆优化算法"></a>使用最小二叉堆优化算法</h2><ol>
+<li>当一棵二叉树的每个结点都大于它的两个子结点时，被称为堆有序；<img src="/2017/08/03/thinking-about-a-star-algorithm/0.png" alt="0.png" title=""></li>
+<li>叉堆有两种：最大堆和最小堆。<br>最大堆：父结点的键值总是大于或等于任何一个子结点的键值；<br>最小堆：父结点的键值总是小于或等于任何一个子节点的键值。<br>二叉堆一般都通过”数组”来实现。数组实现的二叉堆，父节点和子节点的位置存在一定的关系。我们将”二叉堆的第一个元素”放在数组索引0的位置。<br>假设”第一个元素”在数组中的索引为 0 的话，则父节点和子节点的位置关系如下： </li>
+</ol>
+<ul>
+<li>索引为i的左孩子的索引是 (2*i+1); </li>
+<li>索引为i的左孩子的索引是 (2*i+2); </li>
+<li>索引为i的父结点的索引是 floor((i-1)/2);<br>当插入一个新的节点的时候怎么保持二叉堆任然有序呢？<img src="/2017/08/03/thinking-about-a-star-algorithm/1.png" alt="1.png" title="">
+假设要在这个二叉堆里入队一个单元，只要在数组末尾加入这个元素，然后把这个元素往上挪，直到挪不动，经过了这种复杂度为Ο(logn)的操作，二叉堆性质没有变化。<br>当删除节点的时候又该怎样保持二叉堆任然有序呢？<img src="/2017/08/03/thinking-about-a-star-algorithm/2.png" alt="2.png" title="">
+</li>
+</ul>
+<h2 id="程序运行截图"><a href="#程序运行截图" class="headerlink" title="程序运行截图"></a>程序运行截图</h2><img src="/2017/08/03/thinking-about-a-star-algorithm/demoScreenShoot.png" alt="demoScreenShoot.png" title="">
 <p>好了，就讲到这里了。程序源码<a href="https://github.com/metoor/astar" title="Metoor&#39;s github" target="_blank" rel="external">点我查看</a></p>
 ]]></content>
     
