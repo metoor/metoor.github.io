@@ -110,6 +110,10 @@ html, body {
 }
 .stat-item .label { color: var(--text-dim); }
 .stat-item .value { font-weight: 700; color: var(--accent); }
+.top-actions {
+  display: flex;
+  gap: 6px;
+}
 .back-btn {
   background: none; border: none; color: var(--text);
   font-size: 1.4em; cursor: pointer; padding: 4px 8px;
@@ -1192,8 +1196,10 @@ html, body {
       <div class="stat-item"><span class="label">得分</span><span class="value" id="totalScore">0</span></div>
       <div class="stat-item"><span class="label">连击</span><span class="value" id="totalCombo">0</span></div>
     </div>
-    <button class="sound-toggle" id="soundToggle" onclick="toggleSound()" title="音效开关">🔊</button>
-    <button class="sound-toggle" onclick="SFX.click();showPage('helpPage');renderHelpPage()" title="帮助指南">❓</button>
+    <div class="top-actions">
+      <button class="sound-toggle" id="soundToggle" onclick="toggleSound()" title="音效开关">🔊</button>
+      <button class="sound-toggle" onclick="SFX.click();showPage('helpPage');renderHelpPage()" title="帮助指南">❓</button>
+    </div>
   </div>
 
   <!-- 连击特效 -->
