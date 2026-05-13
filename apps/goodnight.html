@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Goodnight</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  position: fixed;
+  -webkit-overflow-scrolling: auto;
+  background: #0d0d1a;
+  color: #c4c4d4;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.screen {
+  width: 100%;
+  height: 100%;
+  display: none;
+  flex-direction: column;
+}
+.screen.active { display: flex; }
+
+/* ---------- Breathing Screen ---------- */
+#breath-screen {
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.breath-circle {
+  width: 180px;
+  height: 180px;
+  border: 2px solid #6a6aaa;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.breath-circle .inner {
+  width: 120px;
+  height: 120px;
+  border: 1px solid #5a5a9a;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.breath-phase-label {
+  font-size: 14px;
+  color: #8888bb;
+  text-align: center;
+}
+
+.breath-phase {
+  font-size: 13px;
+  color: #6a6a9a;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.breath-timer {
+  font-size: 32px;
+  color: #8888bb;
+  margin-bottom: 24px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.breath-hint {
+  font-size: 12px;
+  color: #5a5a7a;
+  text-align: center;
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+.enter-btn {
+  border: 1px solid #555;
+  background: #2a2a4e;
+  color: #8888aa;
+  padding: 12px 36px;
+  font-size: 14px;
+  border-radius: 24px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.enter-btn:active {
+  background: #3a3a5e;
+  color: #aaaacc;
+}
+
+/* ---------- Night Screen ---------- */
+#night-screen {
+  position: relative;
+}
+
+#sky {
+  flex: 1;
+  width: 100%;
+  display: block;
+}
+
+.mixer-handle {
+  width: 100%;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: rgba(13, 13, 26, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-top: 1px solid #2a2a4e;
+}
+
+.mixer-handle::before {
+  content: '';
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: #4a4a6a;
+}
+
+.mixer-panel {
+  background: rgba(18, 18, 32, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid #2a2a4e;
+  max-height: 320px;
+  overflow: hidden;
+  transition: max-height 0.35s ease, padding 0.35s ease;
+  padding: 8px 16px;
+}
+
+.mixer-panel.collapsed {
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.mixer-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid #1f1f36;
+}
+.mixer-row:last-child { border-bottom: none; }
+
+.sound-icon {
+  font-size: 16px;
+  width: 24px;
+  text-align: center;
+  opacity: 0.8;
+  flex-shrink: 0;
+}
+
+.sound-name {
+  font-size: 13px;
+  width: 48px;
+  color: #8888aa;
+  flex-shrink: 0;
+}
+
+.volume-track {
+  flex: 1;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+}
+
+.volume-track::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: #2a2a4e;
+  border-radius: 2px;
+}
+
+.volume-fill {
+  position: absolute;
+  left: 0;
+  height: 4px;
+  background: #5a5a8a;
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+.volume-thumb {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: #8888aa;
+  border-radius: 50%;
+  transform: translate(-50%, 0);
+  top: 5px;
+  pointer-events: none;
+}
+
+.toggle {
+  width: 36px;
+  height: 20px;
+  border: 1px solid #555;
+  border-radius: 10px;
+  position: relative;
+  background: #2a2a4e;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.toggle.active { background: #4a4a7e; }
+
+.toggle .dot {
+  width: 16px;
+  height: 16px;
+  background: #8888aa;
+  border-radius: 50%;
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  transition: left 0.2s, background 0.2s;
+}
+
+.toggle.active .dot {
+  left: 17px;
+  background: #aaaacc;
+}
+
+.timer-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(13, 13, 26, 0.8);
+  border-top: 1px solid #2a2a4e;
+}
+
+.timer-display {
+  font-size: 14px;
+  color: #6a6a9a;
+  font-variant-numeric: tabular-nums;
+  min-width: 56px;
+}
+
+.timer-presets {
+  display: flex;
+  gap: 8px;
+}
+
+.timer-btn {
+  border: 1px solid #555;
+  background: #2a2a4e;
+  color: #8888aa;
+  padding: 6px 14px;
+  font-size: 12px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.timer-btn:active {
+  background: #3a3a5e;
+  color: #aaaacc;
+}
+.timer-btn.active {
+  background: #4a4a7e;
+  color: #aaaacc;
+  border-color: #6a6a9e;
+}
+
+.timer-custom-input {
+  display: none;
+  align-items: center;
+  gap: 6px;
+}
+.timer-custom-input.visible {
+  display: flex;
+}
+.timer-custom-input input {
+  width: 48px;
+  background: #1a1a2e;
+  border: 1px solid #555;
+  color: #8888bb;
+  font-size: 14px;
+  padding: 4px 6px;
+  border-radius: 8px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.timer-custom-input input:focus {
+  border-color: #6a6a9e;
+  outline: none;
+}
+.timer-custom-confirm {
+  border: 1px solid #555;
+  background: #2a2a4e;
+  color: #8888aa;
+  padding: 4px 10px;
+  font-size: 11px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.timer-custom-confirm:active {
+  background: #3a3a5e;
+  color: #aaaacc;
+}
+
+.fade-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #8888bb;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1s ease;
+  background: rgba(13, 13, 26, 0.3);
+}
+.fade-text.visible { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="screen active" id="breath-screen">
+  <div class="breath-circle" id="breathCircle">
+    <div class="inner">
+      <div class="breath-phase-label" id="phaseLabel">吸气</div>
+    </div>
+  </div>
+  <div class="breath-phase" id="breathPhaseText">4 - 7 - 8 呼吸法</div>
+  <div class="breath-timer" id="breathTimer">4</div>
+  <div class="breath-hint">跟着圆圈的节奏呼吸<br>吸气 4 秒 · 屏息 7 秒 · 呼气 8 秒</div>
+  <button class="enter-btn" id="enterBtn">进入夜晚</button>
+</div>
+
+<div class="screen" id="night-screen">
+  <canvas id="sky"></canvas>
+
+  <div class="mixer-handle" id="mixerHandle" role="button" aria-label="展开/收起混音面板"></div>
+
+  <div class="mixer-panel" id="mixerPanel">
+    <div class="mixer-row" data-layer="rain">
+      <div class="sound-icon">~</div>
+      <div class="sound-name">雨声</div>
+      <div class="volume-track">
+        <div class="volume-fill" style="width: 0%"></div>
+        <div class="volume-thumb" style="left: 0%"></div>
+      </div>
+      <div class="toggle"><div class="dot"></div></div>
+    </div>
+    <div class="mixer-row" data-layer="breeze">
+      <div class="sound-icon">≈</div>
+      <div class="sound-name">微风</div>
+      <div class="volume-track">
+        <div class="volume-fill" style="width: 0%"></div>
+        <div class="volume-thumb" style="left: 0%"></div>
+      </div>
+      <div class="toggle"><div class="dot"></div></div>
+    </div>
+    <div class="mixer-row" data-layer="piano">
+      <div class="sound-icon">♪</div>
+      <div class="sound-name">钢琴</div>
+      <div class="volume-track">
+        <div class="volume-fill" style="width: 0%"></div>
+        <div class="volume-thumb" style="left: 0%"></div>
+      </div>
+      <div class="toggle"><div class="dot"></div></div>
+    </div>
+    <div class="mixer-row" data-layer="insects">
+      <div class="sound-icon">◈</div>
+      <div class="sound-name">虫鸣</div>
+      <div class="volume-track">
+        <div class="volume-fill" style="width: 0%"></div>
+        <div class="volume-thumb" style="left: 0%"></div>
+      </div>
+      <div class="toggle"><div class="dot"></div></div>
+    </div>
+    <div class="mixer-row" data-layer="stream">
+      <div class="sound-icon">♩</div>
+      <div class="sound-name">溪流</div>
+      <div class="volume-track">
+        <div class="volume-fill" style="width: 0%"></div>
+        <div class="volume-thumb" style="left: 0%"></div>
+      </div>
+      <div class="toggle"><div class="dot"></div></div>
+    </div>
+    <div class="mixer-row" data-layer="whitenoise">
+      <div class="sound-icon">☁</div>
+      <div class="sound-name">白噪音</div>
+      <div class="volume-track">
+        <div class="volume-fill" style="width: 0%"></div>
+        <div class="volume-thumb" style="left: 0%"></div>
+      </div>
+      <div class="toggle"><div class="dot"></div></div>
+    </div>
+    <div class="mixer-row" data-layer="thunder">
+      <div class="sound-icon">⚡</div>
+      <div class="sound-name">雷声</div>
+      <div class="volume-track">
+        <div class="volume-fill" style="width: 0%"></div>
+        <div class="volume-thumb" style="left: 0%"></div>
+      </div>
+      <div class="toggle"><div class="dot"></div></div>
+    </div>
+  </div>
+
+  <div class="timer-section">
+    <div class="timer-display" id="timerDisplay">未设定</div>
+    <div class="timer-presets" id="timerPresets">
+      <button class="timer-btn" data-minutes="15">15分</button>
+      <button class="timer-btn" data-minutes="30">30分</button>
+      <button class="timer-btn" data-minutes="45">45分</button>
+      <button class="timer-btn" data-minutes="60">60分</button>
+      <button class="timer-btn timer-custom-btn" id="timerCustomBtn">自定义</button>
+    </div>
+    <div class="timer-custom-input" id="timerCustomInput">
+      <input type="number" id="customMinutes" min="1" max="180" value="20" placeholder="分钟">
+      <button class="timer-custom-confirm" id="customConfirmBtn">开始</button>
+      <button class="timer-btn" id="customCancelBtn">取消</button>
+    </div>
+  </div>
+
+  <div class="fade-text" id="fadeText">晚安……</div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  var phases = [
+    { name: 'inhale', label: '吸气', duration: 4 },
+    { name: 'hold', label: '屏息', duration: 7 },
+    { name: 'exhale', label: '呼气', duration: 8 }
+  ];
+
+  window.breathState = {
+    phaseIndex: 0,
+    elapsed: 0,
+    cycleCount: 0,
+    scale: 0.7,
+    breathFactor: 0
+  };
+
+  var breathCircle = document.getElementById('breathCircle');
+  var phaseLabel = document.getElementById('phaseLabel');
+  var breathTimer = document.getElementById('breathTimer');
+
+  var lastTime = 0;
+
+  function easeOutQuad(t) {
+    return 1 - (1 - t) * (1 - t);
+  }
+
+  function easeInQuad(t) {
+    return t * t;
+  }
+
+  function update(dt, slowdownFactor) {
+    slowdownFactor = slowdownFactor || 1;
+    var effectiveDt = dt / slowdownFactor;
+    var state = window.breathState;
+    var phase = phases[state.phaseIndex];
+
+    state.elapsed += effectiveDt;
+
+    if (state.elapsed >= phase.duration) {
+      state.elapsed -= phase.duration;
+      state.phaseIndex = (state.phaseIndex + 1) % phases.length;
+      if (state.phaseIndex === 0) {
+        state.cycleCount++;
+      }
+      phase = phases[state.phaseIndex];
+    }
+
+    var progress = state.elapsed / phase.duration;
+
+    if (phase.name === 'inhale') {
+      state.scale = 0.7 + 0.6 * easeOutQuad(progress);
+      state.breathFactor = progress;
+    } else if (phase.name === 'hold') {
+      state.scale = 1.3;
+      state.breathFactor = 1;
+    } else if (phase.name === 'exhale') {
+      state.scale = 1.3 - 0.6 * easeInQuad(progress);
+      state.breathFactor = 1 - progress;
+    }
+
+    breathCircle.style.transform = 'scale(' + state.scale + ')';
+    phaseLabel.textContent = phase.label;
+    breathTimer.textContent = Math.ceil(phase.duration - state.elapsed);
+  }
+
+  window.breathUpdate = update;
+
+  function loop(timestamp) {
+    if (!lastTime) {
+      lastTime = timestamp;
+    }
+    var dt = (timestamp - lastTime) / 1000;
+    lastTime = timestamp;
+
+    if (dt > 0.1) {
+      dt = 0.1;
+    }
+
+    update(dt);
+    window.breathAnimId = requestAnimationFrame(loop);
+  }
+
+  window.breathAnimId = requestAnimationFrame(loop);
+})();
+
+(function() {
+  'use strict';
+
+  window.audioCtx = null;
+
+  function ensureAudioContext() {
+    if (!window.audioCtx) {
+      window.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (window.audioCtx.state === 'suspended') {
+      window.audioCtx.resume();
+    }
+  }
+
+  var isNightMode = false;
+  var breathScreen = document.getElementById('breath-screen');
+  var nightScreen = document.getElementById('night-screen');
+  var enterBtn = document.getElementById('enterBtn');
+  var skyCanvas = document.getElementById('sky');
+  var skyCtx = skyCanvas.getContext('2d');
+  window.skyCtx = skyCtx;
+  var nightAnimId = null;
+  var nightLastTime = 0;
+  var stars = [];
+
+  function generateStars() {
+    stars = [];
+    for (var i = 0; i < 120 + Math.floor(Math.random() * 80); i++) {
+      stars.push({
+        x: Math.random(),
+        y: Math.random() * 0.85,
+        size: 0.4 + Math.random() * 2,
+        baseBrightness: 0.2 + Math.random() * 0.6,
+        twinkleOffset: Math.random() * Math.PI * 2,
+        twinkleSpeed: 0.3 + Math.random() * 3,
+        twinkleDepth: 0.15 + Math.random() * 0.4
+      });
+    }
+  }
+
+  // Shooting stars
+  var shootingStars = [];
+  var shootingStarTimer = 0;
+
+  // Warm messages
+  var warmMessages = [
+    '今夜星光为你而亮',
+    '闭上眼，世界很温柔',
+    '你值得一个好梦',
+    '月光正悄悄守着你',
+    '明天会更好，先好好睡',
+    '夜深了，让心事静下来',
+    '这一刻只属于你',
+    '所有的疲惫都会过去',
+    '星星在陪你，别怕',
+    '愿月光抚平你的心事',
+    '安心睡吧，夜很温柔',
+    '这一夜，有人惦记着你'
+  ];
+  var warmMsgState = {
+    index: Math.floor(Math.random() * warmMessages.length),
+    alpha: 0,
+    fadeIn: true,
+    timer: 5 + Math.random() * 10,
+    nextInterval: 5 + Math.random() * 20
+  };
+
+  function spawnShootingStar(w, h, dpr) {
+    shootingStars.push({
+      x: Math.random() * w * 0.6 + w * 0.2,
+      y: Math.random() * h * 0.3,
+      vx: (2 + Math.random() * 3) * dpr,
+      vy: (1 + Math.random() * 2) * dpr,
+      life: 1,
+      decay: 0.6 + Math.random() * 0.4,
+      length: (30 + Math.random() * 50) * dpr,
+      width: (1 + Math.random() * 1.5) * dpr
+    });
+  }
+
+  function getTimePalette() {
+    var hour = new Date().getHours();
+    if (hour >= 21 && hour < 23) {
+      return { bg1: '#0d0d2e', bg2: '#1a1a3e', horizon: '#2a2040', starMultiplier: 0.8 };
+    } else if (hour >= 23 || hour < 1) {
+      return { bg1: '#08081a', bg2: '#0d0d2e', horizon: '#151530', starMultiplier: 0.9 };
+    } else if (hour >= 1 && hour < 4) {
+      return { bg1: '#050510', bg2: '#08081a', horizon: '#0a0a1a', starMultiplier: 1.0 };
+    } else if (hour >= 4 && hour < 6) {
+      return { bg1: '#0d0d1a', bg2: '#1a1520', horizon: '#2a1a25', starMultiplier: 0.7 };
+    } else {
+      if (hour >= 6 && hour < 13) {
+        return { bg1: '#0d0d1a', bg2: '#1a1520', horizon: '#2a1a25', starMultiplier: 0.7 };
+      } else {
+        return { bg1: '#0d0d2e', bg2: '#1a1a3e', horizon: '#2a2040', starMultiplier: 0.8 };
+      }
+    }
+  }
+
+  function resizeCanvas() {
+    var dpr = window.devicePixelRatio || 1;
+    skyCanvas.width = skyCanvas.clientWidth * dpr;
+    skyCanvas.height = skyCanvas.clientHeight * dpr;
+  }
+
+  function renderNight(timestamp, dt) {
+    var dpr = window.devicePixelRatio || 1;
+    var w = skyCanvas.width;
+    var h = skyCanvas.height;
+    var palette = getTimePalette();
+    var now = timestamp / 1000;
+    var audioVolumes = window.audioVolumes;
+    var fadeAlpha = skyCtx.globalAlpha;
+
+    skyCtx.globalAlpha = 1;
+    window.updateTimer && window.updateTimer();
+    fadeAlpha = skyCtx.globalAlpha;
+    skyCtx.globalAlpha = 1;
+
+    var gradient = skyCtx.createLinearGradient(0, 0, 0, h);
+    gradient.addColorStop(0, palette.bg1);
+    gradient.addColorStop(0.7, palette.bg2);
+    gradient.addColorStop(1, palette.horizon);
+    skyCtx.fillStyle = gradient;
+    skyCtx.fillRect(0, 0, w, h);
+
+    var breathBrightness = 0.5 + window.breathState.breathFactor * 0.5;
+    var breathFactor = window.breathState.breathFactor;
+
+    for (var i = 0; i < stars.length; i++) {
+      var star = stars[i];
+      // Natural twinkle: slow sine-based brightness oscillation
+      var twinkle = Math.sin(now * star.twinkleSpeed + star.twinkleOffset);
+      var brightness = star.baseBrightness * palette.starMultiplier * breathBrightness;
+      brightness += twinkle * star.twinkleDepth * palette.starMultiplier;
+
+      if (audioVolumes.piano > 0) {
+        brightness += audioVolumes.piano * 0.3 * breathFactor;
+      }
+
+      if (audioVolumes.insects > 0) {
+        var insectFlash = Math.sin(now * (3 + audioVolumes.insects * 8) + star.twinkleOffset);
+        if (insectFlash > 0.7) {
+          brightness += audioVolumes.insects * 0.5 * ((insectFlash - 0.7) / 0.3);
+        }
+      }
+
+      var alpha = Math.max(0.05, Math.min(1, brightness));
+
+      var sx = star.x * w;
+      if (audioVolumes.breeze > 0) {
+        sx += Math.sin(now * 1.5 + star.twinkleOffset) * audioVolumes.breeze * 8 * dpr;
+      }
+
+      skyCtx.beginPath();
+      skyCtx.arc(sx, star.y * h, star.size * dpr, 0, Math.PI * 2);
+      skyCtx.fillStyle = 'rgba(200,200,220,' + alpha.toFixed(2) + ')';
+      skyCtx.fill();
+
+      // Soft glow around brighter stars
+      if (alpha > 0.65 && star.size > 1.2) {
+        skyCtx.beginPath();
+        skyCtx.arc(sx, star.y * h, star.size * dpr * 2.5, 0, Math.PI * 2);
+        skyCtx.fillStyle = 'rgba(180,190,220,' + (alpha * 0.1).toFixed(3) + ')';
+        skyCtx.fill();
+      }
+    }
+
+    // Shooting stars — random spawn every 3-8 seconds
+    shootingStarTimer += dt;
+    if (shootingStarTimer > 1 + Math.random() * 3) {
+      shootingStarTimer = 0;
+      spawnShootingStar(w, h, dpr);
+    }
+
+    for (var mi = shootingStars.length - 1; mi >= 0; mi--) {
+      var m = shootingStars[mi];
+      m.x += m.vx;
+      m.y += m.vy;
+      m.life -= m.decay * dt;
+
+      if (m.life <= 0) {
+        shootingStars.splice(mi, 1);
+        continue;
+      }
+
+      var mAlpha = Math.min(1, m.life);
+      var speed = Math.sqrt(m.vx * m.vx + m.vy * m.vy);
+      var tailX = m.x - (m.vx / speed) * m.length * mAlpha;
+      var tailY = m.y - (m.vy / speed) * m.length * mAlpha;
+
+      var mGrad = skyCtx.createLinearGradient(m.x, m.y, tailX, tailY);
+      mGrad.addColorStop(0, 'rgba(255,255,255,' + (mAlpha * 0.9).toFixed(2) + ')');
+      mGrad.addColorStop(0.3, 'rgba(200,210,240,' + (mAlpha * 0.5).toFixed(2) + ')');
+      mGrad.addColorStop(1, 'rgba(200,210,240,0)');
+
+      skyCtx.beginPath();
+      skyCtx.moveTo(m.x, m.y);
+      skyCtx.lineTo(tailX, tailY);
+      skyCtx.strokeStyle = mGrad;
+      skyCtx.lineWidth = m.width * mAlpha;
+      skyCtx.lineCap = 'round';
+      skyCtx.stroke();
+
+      // Head glow
+      skyCtx.beginPath();
+      skyCtx.arc(m.x, m.y, m.width * 2.5 * mAlpha, 0, Math.PI * 2);
+      skyCtx.fillStyle = 'rgba(220,230,255,' + (mAlpha * 0.35).toFixed(2) + ')';
+      skyCtx.fill();
+    }
+
+    var rain = audioVolumes.rain || 0;
+    if (rain > 0) {
+      var rainCount = Math.floor(rain * 100);
+      skyCtx.strokeStyle = 'rgba(100,130,160,' + (rain * 0.4) + ')';
+      skyCtx.lineWidth = 1 * dpr;
+      skyCtx.beginPath();
+      for (var r = 0; r < rainCount; r++) {
+        var rx = Math.random() * w;
+        var ry = Math.random() * h;
+        var rlen = (10 + Math.random() * 15) * dpr;
+        skyCtx.moveTo(rx, ry);
+        skyCtx.lineTo(rx - 1 * dpr, ry + rlen);
+      }
+      skyCtx.stroke();
+    }
+
+    var stream = audioVolumes.stream || 0;
+    if (stream > 0) {
+      var rippleCount = Math.floor(stream * 6) + 1;
+      skyCtx.strokeStyle = 'rgba(80,120,160,' + (stream * 0.3) + ')';
+      skyCtx.lineWidth = 1 * dpr;
+      for (var ri = 0; ri < rippleCount; ri++) {
+        var ry = h - (20 + ri * 15) * dpr;
+        skyCtx.beginPath();
+        for (var x = 0; x <= w; x += 2 * dpr) {
+          var y = ry + Math.sin((x / w) * 8 + now * 2 + ri) * 3 * dpr;
+          if (x === 0) {
+            skyCtx.moveTo(x, y);
+          } else {
+            skyCtx.lineTo(x, y);
+          }
+        }
+        skyCtx.stroke();
+      }
+    }
+
+    var whitenoise = audioVolumes.whitenoise || 0;
+    if (whitenoise > 0) {
+      var grainCount = Math.min(800, Math.floor(whitenoise * 1500));
+      for (var g = 0; g < grainCount; g++) {
+        var gx = Math.random() * w;
+        var gy = Math.random() * h;
+        var gAlpha = Math.random() * whitenoise * 0.12;
+        skyCtx.fillStyle = 'rgba(200,200,220,' + gAlpha + ')';
+        skyCtx.fillRect(gx, gy, 2 * dpr, 2 * dpr);
+      }
+    }
+
+    var thunder = audioVolumes.thunder || 0;
+    if (thunder > 0 && Math.random() < thunder * 0.03) {
+      skyCtx.fillStyle = 'rgba(200,200,240,' + (0.1 + Math.random() * 0.2) + ')';
+      skyCtx.fillRect(0, 0, w, h);
+    }
+
+    // Warm message — fade in/out with random intervals
+    warmMsgState.timer -= dt;
+    if (warmMsgState.timer <= 0) {
+      if (warmMsgState.fadeIn) {
+        warmMsgState.alpha += dt * 0.5;
+        if (warmMsgState.alpha >= 1) {
+          warmMsgState.alpha = 1;
+          warmMsgState.fadeIn = false;
+          warmMsgState.timer = 5 + Math.random() * 8;
+        }
+      } else {
+        warmMsgState.alpha -= dt * 0.4;
+        if (warmMsgState.alpha <= 0) {
+          warmMsgState.alpha = 0;
+          warmMsgState.fadeIn = true;
+          warmMsgState.index = Math.floor(Math.random() * warmMessages.length);
+          warmMsgState.timer = 5 + Math.random() * 15;
+        warmMsgState.nextInterval = 5 + Math.random() * 20;
+        }
+      }
+    }
+
+    if (warmMsgState.alpha > 0.01) {
+      var msgAlpha = warmMsgState.alpha * fadeAlpha * 0.55;
+      if (msgAlpha > 0.01) {
+        skyCtx.font = (14 * dpr) + 'px -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+        skyCtx.textAlign = 'center';
+        skyCtx.fillStyle = 'rgba(136,136,187,' + msgAlpha.toFixed(3) + ')';
+        skyCtx.fillText(warmMessages[warmMsgState.index], w / 2, h * 0.45);
+        skyCtx.textAlign = 'start';
+      }
+    }
+
+    var globalAlpha = skyCtx.globalAlpha;
+    if (globalAlpha > 0.1) {
+      var nowDate = new Date();
+      var hour = nowDate.getHours();
+      var minute = nowDate.getMinutes();
+      var phaseLabel;
+      if (hour >= 21 && hour < 23) {
+        phaseLabel = '深夜';
+      } else if (hour >= 23 || hour < 1) {
+        phaseLabel = '夜深';
+      } else if (hour >= 1 && hour < 4) {
+        phaseLabel = '凌晨';
+      } else if (hour >= 4 && hour < 6) {
+        phaseLabel = '黎明';
+      } else {
+        phaseLabel = '';
+      }
+      var timeStr = (hour < 10 ? '0' : '') + hour + ':' + (minute < 10 ? '0' : '') + minute;
+      if (phaseLabel) {
+        timeStr += ' · ' + phaseLabel;
+      }
+      skyCtx.font = (10 * dpr) + 'px system-ui';
+      skyCtx.fillStyle = 'rgba(90,90,138,' + (globalAlpha * 0.6) + ')';
+      skyCtx.textAlign = 'left';
+      skyCtx.textBaseline = 'top';
+      skyCtx.fillText(timeStr, 8 * dpr, 16 * dpr);
+    }
+
+    // Fadeout overlay: black rect at fadeAlpha over the entire scene
+    if (fadeAlpha < 1) {
+      skyCtx.globalAlpha = 1 - fadeAlpha;
+      skyCtx.fillStyle = '#0d0d1a';
+      skyCtx.fillRect(0, 0, w, h);
+      skyCtx.globalAlpha = fadeAlpha;
+    }
+  }
+
+  function nightLoop(timestamp) {
+    if (skyCanvas.width === 0 || skyCanvas.height === 0) {
+      resizeCanvas();
+    }
+    if (!nightLastTime) nightLastTime = timestamp;
+    var dt = (timestamp - nightLastTime) / 1000;
+    nightLastTime = timestamp;
+    if (dt > 0.1) dt = 0.1;
+
+    if (window.breathUpdate) {
+      var slowdown = 1;
+      if (window.timerState && window.timerState.active) {
+        slowdown = 1 + window.timerState.fadeProgress * 0.5;
+      }
+      window.breathUpdate(dt, slowdown);
+    }
+
+    renderNight(timestamp, dt);
+
+    nightAnimId = requestAnimationFrame(nightLoop);
+  }
+
+  function startNightLoop() {
+    resizeCanvas();
+    generateStars();
+    if (nightAnimId) {
+      cancelAnimationFrame(nightAnimId);
+      nightAnimId = null;
+    }
+    nightLastTime = 0;
+    nightAnimId = requestAnimationFrame(nightLoop);
+  }
+
+  window.addEventListener('resize', function() {
+    if (isNightMode) {
+      resizeCanvas();
+    }
+  });
+
+  function enterNight() {
+    if (isNightMode) return;
+    isNightMode = true;
+
+    ensureAudioContext();
+    if (window.initAudioLayers) window.initAudioLayers();
+    if (window.startSynthesizedLayers) window.startSynthesizedLayers();
+    if (window.initMixerSliders) window.initMixerSliders();
+
+    breathScreen.classList.remove('active');
+    nightScreen.classList.add('active');
+
+    if (window.breathAnimId) {
+      cancelAnimationFrame(window.breathAnimId);
+      window.breathAnimId = null;
+    }
+
+    startNightLoop();
+    resetMixerTimer();
+  }
+
+  var mixerPanel = document.getElementById('mixerPanel');
+  var mixerHandle = document.getElementById('mixerHandle');
+  var mixerTimeout = null;
+
+  function resetMixerTimer() {
+    mixerPanel.classList.remove('collapsed');
+    mixerHandle.setAttribute('aria-label', '收起混音面板');
+    clearTimeout(mixerTimeout);
+    mixerTimeout = setTimeout(function() {
+      mixerPanel.classList.add('collapsed');
+      mixerHandle.setAttribute('aria-label', '展开混音面板');
+    }, 5000);
+  }
+
+  mixerHandle.addEventListener('click', function() {
+    if (mixerPanel.classList.contains('collapsed')) {
+      resetMixerTimer();
+    } else {
+      mixerPanel.classList.add('collapsed');
+      mixerHandle.setAttribute('aria-label', '展开混音面板');
+      clearTimeout(mixerTimeout);
+    }
+  });
+
+  mixerPanel.addEventListener('touchstart', resetMixerTimer, { passive: true });
+  mixerPanel.addEventListener('mousedown', resetMixerTimer);
+
+  enterBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    enterNight();
+  });
+
+  breathScreen.addEventListener('click', function(e) {
+    if (e.target.closest('#enterBtn')) return;
+    enterNight();
+  });
+})();
+
+(function() {
+  'use strict';
+
+  var layerNames = ['rain', 'breeze', 'piano', 'insects', 'stream', 'whitenoise', 'thunder'];
+  var noiseBuffer = null;
+
+  window.audioGains = {};
+  window.audioVolumes = {};
+
+  function createNoiseBuffer() {
+    var sampleRate = window.audioCtx.sampleRate;
+    var length = sampleRate * 2;
+    var buffer = window.audioCtx.createBuffer(1, length, sampleRate);
+    var data = buffer.getChannelData(0);
+    for (var i = 0; i < length; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+    return buffer;
+  }
+
+  window.initAudioLayers = function() {
+    for (var i = 0; i < layerNames.length; i++) {
+      var name = layerNames[i];
+      var gain = window.audioCtx.createGain();
+      gain.gain.value = 0;
+      gain.connect(window.audioCtx.destination);
+      window.audioGains[name] = gain;
+      window.audioVolumes[name] = 0;
+    }
+  };
+
+  window.startSynthesizedLayers = function() {
+    if (window.synthLayersStarted) return;
+    window.synthLayersStarted = true;
+    if (!noiseBuffer) {
+      noiseBuffer = createNoiseBuffer();
+    }
+
+    // White noise — raw noise buffer
+    window.whitenoiseSrc = window.audioCtx.createBufferSource();
+    window.whitenoiseSrc.buffer = noiseBuffer;
+    window.whitenoiseSrc.loop = true;
+    window.whitenoiseSrc.connect(window.audioGains.whitenoise);
+    window.whitenoiseSrc.start();
+
+    // Breeze — lowpass filtered noise (soft wind)
+    window.breezeSrc = window.audioCtx.createBufferSource();
+    window.breezeSrc.buffer = noiseBuffer;
+    window.breezeSrc.loop = true;
+    var breezeFilter = window.audioCtx.createBiquadFilter();
+    breezeFilter.type = 'lowpass';
+    breezeFilter.frequency.value = 400;
+    breezeFilter.Q.value = 0.5;
+    window.breezeSrc.connect(breezeFilter);
+    breezeFilter.connect(window.audioGains.breeze);
+    window.breezeSrc.start();
+
+    // Rain — bandpass filtered noise (rain-like patter)
+    window.rainSrc = window.audioCtx.createBufferSource();
+    window.rainSrc.buffer = noiseBuffer;
+    window.rainSrc.loop = true;
+    var rainFilter = window.audioCtx.createBiquadFilter();
+    rainFilter.type = 'bandpass';
+    rainFilter.frequency.value = 3000;
+    rainFilter.Q.value = 0.3;
+    var rainGain = window.audioCtx.createGain();
+    rainGain.gain.value = 2;
+    window.rainSrc.connect(rainFilter);
+    rainFilter.connect(rainGain);
+    rainGain.connect(window.audioGains.rain);
+    window.rainSrc.start();
+
+    // Stream — low-mid bandpass filtered noise with slow LFO modulation (flowing water)
+    window.streamSrc = window.audioCtx.createBufferSource();
+    window.streamSrc.buffer = noiseBuffer;
+    window.streamSrc.loop = true;
+    var streamFilter = window.audioCtx.createBiquadFilter();
+    streamFilter.type = 'bandpass';
+    streamFilter.frequency.value = 800;
+    streamFilter.Q.value = 0.8;
+    var streamLFO = window.audioCtx.createOscillator();
+    streamLFO.type = 'sine';
+    streamLFO.frequency.value = 0.3;
+    var streamLFOGain = window.audioCtx.createGain();
+    streamLFOGain.gain.value = 200;
+    streamLFO.connect(streamLFOGain);
+    streamLFOGain.connect(streamFilter.frequency);
+    streamLFO.start();
+    window.streamSrc.connect(streamFilter);
+    streamFilter.connect(window.audioGains.stream);
+    window.streamSrc.start();
+
+    // Insects — high bandpass filtered noise (cricket-like chirping)
+    window.insectsSrc = window.audioCtx.createBufferSource();
+    window.insectsSrc.buffer = noiseBuffer;
+    window.insectsSrc.loop = true;
+    var insectFilter = window.audioCtx.createBiquadFilter();
+    insectFilter.type = 'bandpass';
+    insectFilter.frequency.value = 6000;
+    insectFilter.Q.value = 5;
+    var insectAM = window.audioCtx.createOscillator();
+    insectAM.type = 'square';
+    insectAM.frequency.value = 6;
+    var insectAMGain = window.audioCtx.createGain();
+    insectAMGain.gain.value = 0.5;
+    insectAM.connect(insectAMGain);
+    var insectPostGain = window.audioCtx.createGain();
+    insectPostGain.gain.value = 0;
+    insectAMGain.connect(insectPostGain.gain);
+    window.insectsSrc.connect(insectFilter);
+    insectFilter.connect(insectPostGain);
+    insectPostGain.connect(window.audioGains.insects);
+    window.insectsSrc.start();
+
+    // Piano — gentle sine tone with slow decay envelope (soft ambient piano)
+    // Uses a set of soft oscillators at harmonically related frequencies
+    var pianoFreqs = [261.6, 329.6, 392.0]; // C4, E4, G4 triad
+    var pianoGain = window.audioCtx.createGain();
+    pianoGain.gain.value = 0.15;
+    pianoGain.connect(window.audioGains.piano);
+    for (var p = 0; p < pianoFreqs.length; p++) {
+      var osc = window.audioCtx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = pianoFreqs[p];
+      osc.connect(pianoGain);
+      osc.start();
+    }
+
+    // Thunder — very low filtered noise with slow volume swells
+    window.thunderSrc = window.audioCtx.createBufferSource();
+    window.thunderSrc.buffer = noiseBuffer;
+    window.thunderSrc.loop = true;
+    var thunderFilter = window.audioCtx.createBiquadFilter();
+    thunderFilter.type = 'lowpass';
+    thunderFilter.frequency.value = 120;
+    thunderFilter.Q.value = 0.7;
+    var thunderLFO = window.audioCtx.createOscillator();
+    thunderLFO.type = 'sine';
+    thunderLFO.frequency.value = 0.08;
+    var thunderLFOGain = window.audioCtx.createGain();
+    thunderLFOGain.gain.value = 0.5;
+    var thunderPostGain = window.audioCtx.createGain();
+    thunderPostGain.gain.value = 0;
+    thunderLFO.connect(thunderLFOGain);
+    thunderLFOGain.connect(thunderPostGain.gain);
+    thunderLFO.start();
+    window.thunderSrc.connect(thunderFilter);
+    thunderFilter.connect(thunderPostGain);
+    thunderPostGain.connect(window.audioGains.thunder);
+    window.thunderSrc.start();
+  };
+
+  window.setLayerVolume = function(layerName, vol) {
+    if (window.audioCtx && window.audioCtx.state === 'suspended') {
+      window.audioCtx.resume();
+    }
+    vol = Math.max(0, Math.min(1, vol));
+    window.audioVolumes[layerName] = vol;
+    var gain = window.audioGains[layerName];
+    if (!gain) return;
+    var now = window.audioCtx.currentTime;
+    gain.gain.cancelScheduledValues(now);
+    gain.gain.setValueAtTime(gain.gain.value, now);
+    gain.gain.linearRampToValueAtTime(vol, now + 0.05);
+
+    var row = document.querySelector('.mixer-row[data-layer="' + layerName + '"]');
+    if (!row) return;
+    var fill = row.querySelector('.volume-fill');
+    var thumb = row.querySelector('.volume-thumb');
+    var pct = (vol * 100) + '%';
+    if (fill) fill.style.width = pct;
+    if (thumb) thumb.style.left = pct;
+  };
+
+  window.initMixerSliders = function() {
+    var isDragging = false;
+    var currentLayer = null;
+
+    function updateFromEvent(e, layerName) {
+      var row = document.querySelector('.mixer-row[data-layer="' + layerName + '"]');
+      if (!row) return;
+      var track = row.querySelector('.volume-track');
+      var rect = track.getBoundingClientRect();
+      var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      var ratio = (clientX - rect.left) / rect.width;
+      ratio = Math.max(0, Math.min(1, ratio));
+      window.setLayerVolume(layerName, ratio);
+    }
+
+    var rows = document.querySelectorAll('.mixer-row[data-layer]');
+    for (var i = 0; i < rows.length; i++) {
+      (function(row) {
+        var layerName = row.getAttribute('data-layer');
+        var track = row.querySelector('.volume-track');
+
+        track.addEventListener('mousedown', function(e) {
+          isDragging = true;
+          currentLayer = layerName;
+          updateFromEvent(e, layerName);
+        });
+
+        track.addEventListener('touchstart', function(e) {
+          isDragging = true;
+          currentLayer = layerName;
+          updateFromEvent(e, layerName);
+        }, { passive: true });
+      })(rows[i]);
+    }
+
+    window.addEventListener('mousemove', function(e) {
+      if (!isDragging || !currentLayer) return;
+      updateFromEvent(e, currentLayer);
+    });
+
+    window.addEventListener('touchmove', function(e) {
+      if (!isDragging || !currentLayer) return;
+      updateFromEvent(e, currentLayer);
+    }, { passive: true });
+
+    window.addEventListener('mouseup', function() {
+      isDragging = false;
+      currentLayer = null;
+    });
+
+    window.addEventListener('touchend', function() {
+      isDragging = false;
+      currentLayer = null;
+    });
+
+    // Toggle switch handlers
+    var toggles = document.querySelectorAll('.mixer-row .toggle');
+    for (var t = 0; t < toggles.length; t++) {
+      (function(toggle) {
+        var row = toggle.closest('.mixer-row');
+        var layerName = row.getAttribute('data-layer');
+        toggle.addEventListener('click', function(e) {
+          e.stopPropagation();
+          var isActive = toggle.classList.contains('active');
+          if (isActive) {
+            toggle.classList.remove('active');
+            toggle._savedVol = window.audioVolumes[layerName] || 0;
+            window.setLayerVolume(layerName, 0);
+          } else {
+            toggle.classList.add('active');
+            window.setLayerVolume(layerName, toggle._savedVol || 0.5);
+          }
+        });
+      })(toggles[t]);
+    }
+  };
+})();
+
+(function() {
+  'use strict';
+
+  var LAYERS = ['rain', 'breeze', 'piano', 'insects', 'stream', 'whitenoise', 'thunder'];
+
+  var timerState = {
+    active: false,
+    endTime: 0,
+    fadeDuration: 5 * 60,
+    totalDuration: 0,
+    fadeProgress: 0,
+    preFadeVolumes: {}
+  };
+  window.timerState = timerState;
+
+  var timerDisplay = document.getElementById('timerDisplay');
+  var fadeText = document.getElementById('fadeText');
+  var nightScreen = document.getElementById('night-screen');
+
+  function startTimer(minutes) {
+    timerState.active = true;
+    timerState.totalDuration = minutes * 60;
+    timerState.endTime = Date.now() + minutes * 60 * 1000;
+    timerState.fadeProgress = 0;
+
+    for (var i = 0; i < LAYERS.length; i++) {
+      var name = LAYERS[i];
+      timerState.preFadeVolumes[name] = window.audioVolumes[name] || 0;
+    }
+
+    var buttons = document.querySelectorAll('.timer-btn');
+    for (var i = 0; i < buttons.length; i++) {
+      var btn = buttons[i];
+      if (parseInt(btn.dataset.minutes) === minutes) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    }
+  }
+
+  function cancelTimer() {
+    timerState.active = false;
+    timerState.fadeProgress = 0;
+
+    var buttons = document.querySelectorAll('.timer-btn');
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].classList.remove('active');
+    }
+
+    for (var i = 0; i < LAYERS.length; i++) {
+      var name = LAYERS[i];
+      var vol = timerState.preFadeVolumes[name];
+      if (typeof vol === 'number') {
+        window.setLayerVolume(name, vol);
+      }
+    }
+
+    if (window.skyCtx) {
+      window.skyCtx.globalAlpha = 1;
+    }
+
+    if (timerDisplay) timerDisplay.textContent = '未设定';
+    if (fadeText) fadeText.classList.remove('visible');
+  }
+
+  var timerButtons = document.querySelectorAll('.timer-btn');
+  for (var i = 0; i < timerButtons.length; i++) {
+    (function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var mins = parseInt(btn.dataset.minutes);
+        if (timerState.active && btn.classList.contains('active')) {
+          cancelTimer();
+        } else {
+          startTimer(mins);
+        }
+      });
+    })(timerButtons[i]);
+  }
+
+  // Custom timer input
+  var timerCustomBtn = document.getElementById('timerCustomBtn');
+  var timerPresets = document.getElementById('timerPresets');
+  var timerCustomInput = document.getElementById('timerCustomInput');
+  var customMinutes = document.getElementById('customMinutes');
+  var customConfirmBtn = document.getElementById('customConfirmBtn');
+  var customCancelBtn = document.getElementById('customCancelBtn');
+
+  function showCustomInput() {
+    timerPresets.style.display = 'none';
+    timerCustomInput.classList.add('visible');
+    customMinutes.focus();
+  }
+
+  function hideCustomInput() {
+    timerPresets.style.display = '';
+    timerCustomInput.classList.remove('visible');
+  }
+
+  timerCustomBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    showCustomInput();
+  });
+
+  customCancelBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    hideCustomInput();
+  });
+
+  customConfirmBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    var mins = parseInt(customMinutes.value);
+    if (!mins || mins < 1) mins = 1;
+    if (mins > 180) mins = 180;
+    hideCustomInput();
+    startTimer(mins);
+  });
+
+  customMinutes.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      customConfirmBtn.click();
+    }
+  });
+
+  window.updateTimer = function() {
+    if (!timerState.active) return;
+
+    var remaining = Math.max(0, (timerState.endTime - Date.now()) / 1000);
+
+    var mins = Math.floor(remaining / 60);
+    var secs = Math.floor(remaining % 60);
+    timerDisplay.textContent = mins + ':' + (secs < 10 ? '0' : '') + secs;
+
+    if (remaining <= 0) {
+      timerState.active = false;
+      timerState.fadeProgress = 1;
+
+      for (var i = 0; i < LAYERS.length; i++) {
+        window.setLayerVolume(LAYERS[i], 0);
+      }
+
+      if (window.skyCtx) {
+        window.skyCtx.globalAlpha = 0;
+      }
+
+      timerDisplay.textContent = '';
+      fadeText.classList.add('visible');
+    } else if (remaining <= timerState.fadeDuration) {
+      timerState.fadeProgress = 1 - (remaining / timerState.fadeDuration);
+
+      for (var i = 0; i < LAYERS.length; i++) {
+        var name = LAYERS[i];
+        var preVol = timerState.preFadeVolumes[name] || 0;
+        window.setLayerVolume(name, preVol * (1 - timerState.fadeProgress));
+      }
+
+      if (window.skyCtx) {
+        window.skyCtx.globalAlpha = 1 - timerState.fadeProgress;
+      }
+    }
+  };
+
+  nightScreen.addEventListener('click', function(e) {
+    if (timerState.fadeProgress >= 1) {
+      if (!e.target.closest('.mixer-panel') && !e.target.closest('.timer-section') && !e.target.closest('.mixer-handle')) {
+        cancelTimer();
+      }
+    }
+  });
+})();
+</script>
+</body>
+</html>
