@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>文件导航页</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, Arial;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            min-height: 100vh;
+            padding: 40px 20px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: auto;
+        }
+
+        h1 {
+            color: #fff;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+            overflow: hidden;
+        }
+
+        .item {
+            display: flex;
+            align-items: center;
+            padding: 14px 18px;
+            border-bottom: 1px solid #eee;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.2s;
+        }
+
+        .item:last-child {
+            border-bottom: none;
+        }
+
+        .item:hover {
+            background: #f5f8ff;
+            transform: translateX(4px);
+        }
+
+        .icon {
+            width: 36px;
+            height: 36px;
+            margin-right: 14px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+        }
+
+        .html { background: #cce5ff; color: #004085; }
+        .css  { background: #e2d9f3; color: #6f42c1; }
+        .js   { background: #fce4ec; color: #c2185b; }
+        .md   { background: #e8f5e9; color: #2e7d32; }
+        .folder { background: #fff3cd; color: #856404; }
+        .other { background: #f1f1f1; color: #555; }
+
+        .name {
+            font-size: 16px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📂 文件导航</h1>
+
+    <div class="card" id="list">
+        <!-- JS 渲染 -->
+    </div>
+</div>
+
+<script>
+/**
+ * ✅ 在这里配置你的文件和跳转规则
+ */
+const fileList = [
+    {
+        name: "gtmaster",
+        url: "gtmaster.html",
+        type: "html"
+    },
+	{
+        name: "goodnight",
+        url: "goodnight/goodnight.html",
+        type: "html"
+    }
+];
+
+/**
+ * 图标映射
+ */
+function getIcon(type) {
+    const map = {
+        html: "🌐",
+        css: "🎨",
+        js: "⚡",
+        md: "📝",
+        folder: "📁",
+        other: "📄"
+    };
+    return map[type] || map.other;
+}
+
+/**
+ * 渲染列表
+ */
+const listEl = document.getElementById("list");
+
+fileList.forEach(item => {
+    const div = document.createElement("a");
+    div.className = "item";
+    div.href = item.url;
+
+    div.innerHTML = `
+        <div class="icon ${item.type}">${getIcon(item.type)}</div>
+        <div class="name">${item.name}</div>
+    `;
+
+    listEl.appendChild(div);
+});
+</script>
+
+</body>
+</html>

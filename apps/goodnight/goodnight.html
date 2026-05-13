@@ -102,50 +102,88 @@ html, body {
 /* ---------- Night Screen ---------- */
 #night-screen {
   position: relative;
+  overflow: hidden;
 }
 
 #sky {
-  flex: 1;
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
+  height: 100%;
   display: block;
+  z-index: 0;
 }
 
-.mixer-handle {
-  width: 100%;
-  height: 28px;
+.tab-bar {
+  position: absolute;
+  bottom: 44px;
+  left: 0;
+  right: 0;
+  z-index: 3;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  background: rgba(13, 13, 26, 0.6);
+  height: 32px;
+  background: rgba(13, 13, 26, 0.7);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border-top: 1px solid #2a2a4e;
 }
 
-.mixer-handle::before {
-  content: '';
-  width: 36px;
-  height: 4px;
-  border-radius: 2px;
-  background: #4a4a6a;
+.tab-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  color: #6a6a8a;
+  font-size: 12px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+}
+.tab-btn.active {
+  color: #aaaacc;
+  border-bottom-color: #6a6a9e;
 }
 
 .mixer-panel {
+  position: absolute;
+  bottom: 76px;
+  left: 0;
+  right: 0;
+  z-index: 3;
   background: rgba(18, 18, 32, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-top: 1px solid #2a2a4e;
-  max-height: 320px;
   overflow: hidden;
-  transition: max-height 0.35s ease, padding 0.35s ease;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  max-height: 0;
+  opacity: 0;
   padding: 8px 16px;
 }
+.mixer-panel.expanded {
+  max-height: 400px;
+  opacity: 1;
+}
 
-.mixer-panel.collapsed {
+#musicPanel {
+  position: absolute;
+  bottom: 76px;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  background: rgba(18, 18, 32, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid #2a2a4e;
+  overflow: hidden;
+  overflow-y: auto;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
   max-height: 0;
-  padding-top: 0;
-  padding-bottom: 0;
+  opacity: 0;
+}
+#musicPanel.expanded {
+  max-height: 400px;
+  opacity: 1;
 }
 
 .mixer-row {
@@ -242,6 +280,11 @@ html, body {
 }
 
 .timer-section {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -249,6 +292,7 @@ html, body {
   padding: 12px 16px;
   background: rgba(13, 13, 26, 0.8);
   border-top: 1px solid #2a2a4e;
+  height: 44px;
 }
 
 .timer-display {
@@ -323,6 +367,7 @@ html, body {
 .fade-text {
   position: absolute;
   inset: 0;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -334,6 +379,49 @@ html, body {
   background: rgba(13, 13, 26, 0.3);
 }
 .fade-text.visible { opacity: 1; }
+
+.music-list {
+  padding: 4px 0;
+}
+.music-list-empty {
+  padding: 24px 20px;
+  font-size: 13px;
+  color: #5a5a7a;
+  text-align: center;
+  line-height: 1.6;
+}
+.music-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.music-item:active { background: rgba(80, 80, 140, 0.15); }
+.music-item.playing { background: rgba(80, 80, 140, 0.12); }
+.music-item-icon {
+  font-size: 16px;
+  width: 24px;
+  text-align: center;
+  color: #6a6a9a;
+}
+.music-item.playing .music-item-icon { color: #aaaadd; }
+.music-item-name {
+  font-size: 13px;
+  color: #8888aa;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.music-item.playing .music-item-name { color: #bbbbdd; }
+.music-item-playing {
+  font-size: 11px;
+  color: #6a6a9a;
+  display: none;
+}
+.music-item.playing .music-item-playing { display: inline; }
 </style>
 </head>
 <body>
@@ -353,7 +441,10 @@ html, body {
 <div class="screen" id="night-screen">
   <canvas id="sky"></canvas>
 
-  <div class="mixer-handle" id="mixerHandle" role="button" aria-label="展开/收起混音面板"></div>
+  <div class="tab-bar" id="tabBar">
+    <button class="tab-btn active" data-tab="mixer">声音</button>
+    <button class="tab-btn" data-tab="music">音乐</button>
+  </div>
 
   <div class="mixer-panel" id="mixerPanel">
     <div class="mixer-row" data-layer="rain">
@@ -419,6 +510,10 @@ html, body {
       </div>
       <div class="toggle"><div class="dot"></div></div>
     </div>
+  </div>
+
+  <div class="mixer-panel" id="musicPanel">
+    <div id="musicList" class="music-list"></div>
   </div>
 
   <div class="timer-section">
@@ -584,14 +679,28 @@ html, body {
     '星星在陪你，别怕',
     '愿月光抚平你的心事',
     '安心睡吧，夜很温柔',
-    '这一夜，有人惦记着你'
+    '这一夜，有人惦记着你',
+    '风替我抱了抱你',
+    '慢慢来，一切都来得及',
+    '你已经很努力了',
+    '今夜无需坚强也没关系',
+    '梦里什么都有',
+    '放下手机，世界会等你',
+    '黑夜是温柔的被窝',
+    '不必完美，足够好就好',
+    '月色很美，你也是',
+    '一切都会好起来的',
+    '今晚什么都不用想',
+    '你的疲惫，夜都懂'
   ];
   var warmMsgState = {
     index: Math.floor(Math.random() * warmMessages.length),
     alpha: 0,
     fadeIn: true,
-    timer: 5 + Math.random() * 10,
-    nextInterval: 5 + Math.random() * 20
+    timer: 0,
+    nextInterval: 5 + Math.random() * 20,
+    posX: 0.15 + Math.random() * 0.7,
+    posY: 0.1 + Math.random() * 0.45
   };
 
   function spawnShootingStar(w, h, dpr) {
@@ -628,8 +737,8 @@ html, body {
 
   function resizeCanvas() {
     var dpr = window.devicePixelRatio || 1;
-    skyCanvas.width = skyCanvas.clientWidth * dpr;
-    skyCanvas.height = skyCanvas.clientHeight * dpr;
+    skyCanvas.width = window.innerWidth * dpr;
+    skyCanvas.height = window.innerHeight * dpr;
   }
 
   function renderNight(timestamp, dt) {
@@ -786,10 +895,11 @@ html, body {
       }
     }
 
-    var thunder = audioVolumes.thunder || 0;
-    if (thunder > 0 && Math.random() < thunder * 0.03) {
-      skyCtx.fillStyle = 'rgba(200,200,240,' + (0.1 + Math.random() * 0.2) + ')';
+    var flashAlpha = window.thunderFlashAlpha || 0;
+    if (flashAlpha > 0.01) {
+      skyCtx.fillStyle = 'rgba(200,200,240,' + flashAlpha.toFixed(3) + ')';
       skyCtx.fillRect(0, 0, w, h);
+      window.thunderFlashAlpha = flashAlpha * (1 - dt * 4);
     }
 
     // Warm message — fade in/out with random intervals
@@ -800,7 +910,7 @@ html, body {
         if (warmMsgState.alpha >= 1) {
           warmMsgState.alpha = 1;
           warmMsgState.fadeIn = false;
-          warmMsgState.timer = 5 + Math.random() * 8;
+          warmMsgState.timer = 3 + Math.random() * 3;
         }
       } else {
         warmMsgState.alpha -= dt * 0.4;
@@ -808,7 +918,9 @@ html, body {
           warmMsgState.alpha = 0;
           warmMsgState.fadeIn = true;
           warmMsgState.index = Math.floor(Math.random() * warmMessages.length);
-          warmMsgState.timer = 5 + Math.random() * 15;
+          warmMsgState.posX = 0.15 + Math.random() * 0.7;
+          warmMsgState.posY = 0.15 + Math.random() * 0.55;
+          warmMsgState.timer = 2 + Math.random() * 3;
         warmMsgState.nextInterval = 5 + Math.random() * 20;
         }
       }
@@ -817,10 +929,19 @@ html, body {
     if (warmMsgState.alpha > 0.01) {
       var msgAlpha = warmMsgState.alpha * fadeAlpha * 0.55;
       if (msgAlpha > 0.01) {
-        skyCtx.font = (14 * dpr) + 'px -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+        skyCtx.font = (18 * dpr) + 'px "楷体", "KaiTi", "STKaiti", "华文楷体", serif';
         skyCtx.textAlign = 'center';
         skyCtx.fillStyle = 'rgba(136,136,187,' + msgAlpha.toFixed(3) + ')';
-        skyCtx.fillText(warmMessages[warmMsgState.index], w / 2, h * 0.45);
+        var msgText = warmMessages[warmMsgState.index];
+        var halfW = skyCtx.measureText(msgText).width / 2;
+        var pad = 8 * dpr;
+        var msgX = warmMsgState.posX * w;
+        msgX = Math.max(msgX, halfW + pad);
+        msgX = Math.min(msgX, w - halfW - pad);
+        var msgY = warmMsgState.posY * h;
+        msgY = Math.max(msgY, 20 * dpr);
+        msgY = Math.min(msgY, h - 20 * dpr);
+        skyCtx.fillText(msgText, msgX, msgY);
         skyCtx.textAlign = 'start';
       }
     }
@@ -919,35 +1040,52 @@ html, body {
     }
 
     startNightLoop();
-    resetMixerTimer();
+    expandPanel('mixer');
   }
 
   var mixerPanel = document.getElementById('mixerPanel');
-  var mixerHandle = document.getElementById('mixerHandle');
-  var mixerTimeout = null;
+  var musicPanel = document.getElementById('musicPanel');
+  var tabBar = document.getElementById('tabBar');
+  var panelTimeout = null;
+  var activeTab = 'mixer';
 
-  function resetMixerTimer() {
-    mixerPanel.classList.remove('collapsed');
-    mixerHandle.setAttribute('aria-label', '收起混音面板');
-    clearTimeout(mixerTimeout);
-    mixerTimeout = setTimeout(function() {
-      mixerPanel.classList.add('collapsed');
-      mixerHandle.setAttribute('aria-label', '展开混音面板');
-    }, 5000);
+  function expandPanel(tab) {
+    clearTimeout(panelTimeout);
+    activeTab = tab;
+    // Update tab buttons
+    var btns = tabBar.querySelectorAll('.tab-btn');
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].classList.toggle('active', btns[i].dataset.tab === tab);
+    }
+    // Show selected panel, hide other
+    mixerPanel.classList.toggle('expanded', tab === 'mixer');
+    musicPanel.classList.toggle('expanded', tab === 'music');
+    if (tab === 'music') loadMusicList();
+    // Auto-collapse after 6s
+    panelTimeout = setTimeout(collapsePanel, 6000);
   }
 
-  mixerHandle.addEventListener('click', function() {
-    if (mixerPanel.classList.contains('collapsed')) {
-      resetMixerTimer();
+  function collapsePanel() {
+    mixerPanel.classList.remove('expanded');
+    musicPanel.classList.remove('expanded');
+  }
+
+  tabBar.addEventListener('click', function(e) {
+    var btn = e.target.closest('.tab-btn');
+    if (!btn) return;
+    e.stopPropagation();
+    var tab = btn.dataset.tab;
+    if ((activeTab === tab && mixerPanel.classList.contains('expanded')) || (activeTab === tab && musicPanel.classList.contains('expanded'))) {
+      collapsePanel();
     } else {
-      mixerPanel.classList.add('collapsed');
-      mixerHandle.setAttribute('aria-label', '展开混音面板');
-      clearTimeout(mixerTimeout);
+      expandPanel(tab);
     }
   });
 
-  mixerPanel.addEventListener('touchstart', resetMixerTimer, { passive: true });
-  mixerPanel.addEventListener('mousedown', resetMixerTimer);
+  mixerPanel.addEventListener('mousedown', function() { clearTimeout(panelTimeout); });
+  mixerPanel.addEventListener('touchstart', function() { clearTimeout(panelTimeout); }, { passive: true });
+  musicPanel.addEventListener('mousedown', function() { clearTimeout(panelTimeout); });
+  musicPanel.addEventListener('touchstart', function() { clearTimeout(panelTimeout); }, { passive: true });
 
   enterBtn.addEventListener('click', function(e) {
     e.stopPropagation();
@@ -1074,42 +1212,143 @@ html, body {
     insectPostGain.connect(window.audioGains.insects);
     window.insectsSrc.start();
 
-    // Piano — gentle sine tone with slow decay envelope (soft ambient piano)
-    // Uses a set of soft oscillators at harmonically related frequencies
-    var pianoFreqs = [261.6, 329.6, 392.0]; // C4, E4, G4 triad
-    var pianoGain = window.audioCtx.createGain();
-    pianoGain.gain.value = 0.15;
-    pianoGain.connect(window.audioGains.piano);
-    for (var p = 0; p < pianoFreqs.length; p++) {
-      var osc = window.audioCtx.createOscillator();
-      osc.type = 'sine';
-      osc.frequency.value = pianoFreqs[p];
-      osc.connect(pianoGain);
-      osc.start();
+    // Piano — lullaby melody with per-note attack/decay envelope
+    // Brahms Lullaby opening phrase (simplified, C major)
+    var lullabyNotes = [
+      // [MIDI, durationBeats]
+      [72, 1], [71, 0.5], [69, 0.5], [67, 1], [64, 1],   // G4 F#4 E4 D4 C4
+      [67, 1.5], [69, 0.5], [71, 1], [72, 1],              // D4 E4 F#4 G4
+      [69, 1.5], [67, 0.5], [64, 1.5], [0, 0.5],           // E4 D4 C4 rest
+      [72, 1], [71, 0.5], [69, 0.5], [67, 1], [64, 1],     // G4 F#4 E4 D4 C4
+      [67, 1.5], [69, 0.5], [71, 1.5], [0, 0.5],           // D4 E4 F#4 rest
+      [69, 1], [67, 0.5], [69, 0.5], [67, 1.5], [0, 0.5],  // E4 D4 E4 D4 rest
+      [64, 3], [0, 1]                                        // C4 hold + rest
+    ];
+
+    var bpm = 56;
+    var beatDur = 60 / bpm;
+    var noteIndex = 0;
+    var nextNoteTime = 0;
+
+    function midiToFreq(midi) {
+      return 440 * Math.pow(2, (midi - 69) / 12);
     }
 
-    // Thunder — very low filtered noise with slow volume swells
-    window.thunderSrc = window.audioCtx.createBufferSource();
-    window.thunderSrc.buffer = noiseBuffer;
-    window.thunderSrc.loop = true;
-    var thunderFilter = window.audioCtx.createBiquadFilter();
-    thunderFilter.type = 'lowpass';
-    thunderFilter.frequency.value = 120;
-    thunderFilter.Q.value = 0.7;
-    var thunderLFO = window.audioCtx.createOscillator();
-    thunderLFO.type = 'sine';
-    thunderLFO.frequency.value = 0.08;
-    var thunderLFOGain = window.audioCtx.createGain();
-    thunderLFOGain.gain.value = 0.5;
-    var thunderPostGain = window.audioCtx.createGain();
-    thunderPostGain.gain.value = 0;
-    thunderLFO.connect(thunderLFOGain);
-    thunderLFOGain.connect(thunderPostGain.gain);
-    thunderLFO.start();
-    window.thunderSrc.connect(thunderFilter);
-    thunderFilter.connect(thunderPostGain);
-    thunderPostGain.connect(window.audioGains.thunder);
-    window.thunderSrc.start();
+    function playPianoNote(freq, startTime, durSec) {
+      var ctx = window.audioCtx;
+      // Fundamental
+      var osc1 = ctx.createOscillator();
+      osc1.type = 'sine';
+      osc1.frequency.value = freq;
+      // 2nd harmonic (softer)
+      var osc2 = ctx.createOscillator();
+      osc2.type = 'sine';
+      osc2.frequency.value = freq * 2;
+      var osc2G = ctx.createGain();
+      osc2G.gain.value = 0.15;
+      // 3rd harmonic (barely there)
+      var osc3 = ctx.createOscillator();
+      osc3.type = 'sine';
+      osc3.frequency.value = freq * 3;
+      var osc3G = ctx.createGain();
+      osc3G.gain.value = 0.04;
+
+      var env = ctx.createGain();
+      env.gain.setValueAtTime(0, startTime);
+      env.gain.linearRampToValueAtTime(0.35, startTime + 0.02);
+      env.gain.exponentialRampToValueAtTime(0.12, startTime + 0.15);
+      env.gain.exponentialRampToValueAtTime(0.001, startTime + durSec);
+
+      osc1.connect(env);
+      osc2.connect(osc2G); osc2G.connect(env);
+      osc3.connect(osc3G); osc3G.connect(env);
+      env.connect(window.audioGains.piano);
+
+      osc1.start(startTime); osc1.stop(startTime + durSec + 0.05);
+      osc2.start(startTime); osc2.stop(startTime + durSec + 0.05);
+      osc3.start(startTime); osc3.stop(startTime + durSec + 0.05);
+    }
+
+    function schedulePianoNotes() {
+      var ctx = window.audioCtx;
+      if (ctx.state === 'suspended') ctx.resume();
+
+      // Schedule ahead in 2-second windows
+      while (nextNoteTime < ctx.currentTime + 2) {
+        var note = lullabyNotes[noteIndex];
+        var midi = note[0];
+        var beats = note[1];
+        var durSec = beats * beatDur;
+
+        if (midi > 0) {
+          playPianoNote(midiToFreq(midi), nextNoteTime, durSec * 0.9);
+        }
+
+        nextNoteTime += durSec;
+        noteIndex = (noteIndex + 1) % lullabyNotes.length;
+      }
+    }
+
+    setInterval(schedulePianoNotes, 1000);
+    schedulePianoNotes();
+
+    // Thunder — random burst system (crack + rumble)
+    window.thunderFlashAlpha = 0;
+    window.thunderBurstTimeout = null;
+
+    function scheduleThunderBurst() {
+      var vol = window.audioVolumes.thunder || 0;
+      if (vol < 0.01) {
+        window.thunderBurstTimeout = setTimeout(scheduleThunderBurst, 3000 + Math.random() * 10000);
+        return;
+      }
+
+      var ctx = window.audioCtx;
+      if (ctx.state === 'suspended') ctx.resume();
+      var now = ctx.currentTime;
+      var intensity = 0.3 + Math.random() * 0.7;
+      var rumbleLen = 1.5 + Math.random() * 2.5;
+
+      window.thunderFlashAlpha = 0.3 + intensity * 0.5;
+
+      // Crack — sharp highpass burst
+      var crackSrc = ctx.createBufferSource();
+      crackSrc.buffer = noiseBuffer;
+      var crackF = ctx.createBiquadFilter();
+      crackF.type = 'highpass';
+      crackF.frequency.value = 800 + Math.random() * 3000;
+      var crackG = ctx.createGain();
+      crackG.gain.setValueAtTime(vol * intensity * 0.7, now);
+      crackG.gain.exponentialRampToValueAtTime(0.001, now + 0.08 + Math.random() * 0.12);
+      crackSrc.connect(crackF);
+      crackF.connect(crackG);
+      crackG.connect(window.audioGains.thunder);
+      crackSrc.start(now);
+      crackSrc.stop(now + 0.3);
+
+      // Rumble — rolling lowpass with attack/decay
+      var rumbleSrc = ctx.createBufferSource();
+      rumbleSrc.buffer = noiseBuffer;
+      var rumbleF = ctx.createBiquadFilter();
+      rumbleF.type = 'lowpass';
+      rumbleF.frequency.value = 80 + Math.random() * 60;
+      rumbleF.Q.value = 0.7;
+      var rumbleG = ctx.createGain();
+      rumbleG.gain.setValueAtTime(0, now);
+      rumbleG.gain.linearRampToValueAtTime(vol * intensity * 0.4, now + 0.05);
+      rumbleG.gain.exponentialRampToValueAtTime(0.001, now + rumbleLen);
+      rumbleSrc.connect(rumbleF);
+      rumbleF.connect(rumbleG);
+      rumbleG.connect(window.audioGains.thunder);
+      rumbleSrc.start(now);
+      rumbleSrc.stop(now + rumbleLen + 0.1);
+
+      // Next burst — more volume = more frequent
+      var nextSec = (4 + Math.random() * 16) / Math.max(0.3, vol * 0.7 + 0.3);
+      window.thunderBurstTimeout = setTimeout(scheduleThunderBurst, nextSec * 1000);
+    }
+
+    window.thunderBurstTimeout = setTimeout(scheduleThunderBurst, 2000 + Math.random() * 5000);
   };
 
   window.setLayerVolume = function(layerName, vol) {
@@ -1132,6 +1371,14 @@ html, body {
     var pct = (vol * 100) + '%';
     if (fill) fill.style.width = pct;
     if (thumb) thumb.style.left = pct;
+    var toggle = row.querySelector('.toggle');
+    if (toggle) {
+      if (vol > 0.01) {
+        toggle.classList.add('active');
+      } else {
+        toggle.classList.remove('active');
+      }
+    }
   };
 
   window.initMixerSliders = function() {
@@ -1215,6 +1462,106 @@ html, body {
 (function() {
   'use strict';
 
+  var musicList = document.getElementById('musicList');
+  var musicEl = null;
+  var musicSourceNode = null;
+  var currentMusicFile = '';
+  var musicGain = null;
+
+  var AUDIO_EXTS = ['.mp3', '.ogg', '.wav', '.m4a', '.aac', '.flac', '.webm'];
+
+  function isAudioFile(name) {
+    var lower = name.toLowerCase();
+    for (var i = 0; i < AUDIO_EXTS.length; i++) {
+      if (lower.endsWith(AUDIO_EXTS[i])) return true;
+    }
+    return false;
+  }
+
+  function stripExt(name) {
+    var dot = name.lastIndexOf('.');
+    return dot > 0 ? name.substring(0, dot) : name;
+  }
+
+  function loadMusicList() {
+    musicList.innerHTML = '<div class="music-list-empty">请将音乐文件放入 sound 目录<br>支持 mp3 / ogg / wav / m4a / flac</div>';
+
+    fetch('sound/')
+      .then(function(r) { return r.text(); })
+      .then(function(html) {
+        var files = [];
+        var re = /href="([^"?#]+)"/g;
+        var m;
+        while ((m = re.exec(html)) !== null) {
+          var f = decodeURIComponent(m[1]);
+          if (isAudioFile(f)) files.push(f);
+        }
+        if (files.length === 0) return;
+        musicList.innerHTML = '';
+        files.forEach(function(file) {
+          var div = document.createElement('div');
+          div.className = 'music-item' + (file === currentMusicFile ? ' playing' : '');
+          div.innerHTML = '<span class="music-item-icon">' + (file === currentMusicFile ? '▶' : '♫') + '</span>'
+            + '<span class="music-item-name">' + stripExt(file) + '</span>'
+            + '<span class="music-item-playing">播放中</span>';
+          div.addEventListener('click', function(e) {
+            e.stopPropagation();
+            selectMusic(file);
+          });
+          musicList.appendChild(div);
+        });
+      })
+      .catch(function() {
+        musicList.innerHTML = '<div class="music-list-empty">无法读取 sound 目录<br>请确保目录中有音乐文件</div>';
+      });
+  }
+  window.loadMusicList = loadMusicList;
+
+  function selectMusic(file) {
+    if (currentMusicFile === file && musicEl && !musicEl.paused) {
+      stopMusic();
+      loadMusicList();
+      return;
+    }
+
+    stopMusic();
+
+    currentMusicFile = file;
+
+    musicEl = new Audio('sound/' + file);
+    musicEl.loop = true;
+    musicEl.volume = 1;
+
+    if (window.audioCtx) {
+      if (!musicGain) {
+        musicGain = window.audioCtx.createGain();
+        musicGain.gain.value = 0.5;
+        musicGain.connect(window.audioCtx.destination);
+      }
+      musicSourceNode = window.audioCtx.createMediaElementSource(musicEl);
+      musicSourceNode.connect(musicGain);
+    }
+
+    musicEl.play().catch(function() {});
+    loadMusicList();
+  }
+
+  function stopMusic() {
+    if (musicEl) {
+      musicEl.pause();
+      musicEl.src = '';
+      musicEl = null;
+    }
+    musicSourceNode = null;
+    currentMusicFile = '';
+  }
+
+  window.stopMusic = stopMusic;
+})();
+
+(function() {
+  'use strict';
+
   var LAYERS = ['rain', 'breeze', 'piano', 'insects', 'stream', 'whitenoise', 'thunder'];
 
   var timerState = {
@@ -1242,7 +1589,7 @@ html, body {
       timerState.preFadeVolumes[name] = window.audioVolumes[name] || 0;
     }
 
-    var buttons = document.querySelectorAll('.timer-btn');
+    var buttons = document.querySelectorAll('.timer-btn[data-minutes]');
     for (var i = 0; i < buttons.length; i++) {
       var btn = buttons[i];
       if (parseInt(btn.dataset.minutes) === minutes) {
@@ -1257,7 +1604,7 @@ html, body {
     timerState.active = false;
     timerState.fadeProgress = 0;
 
-    var buttons = document.querySelectorAll('.timer-btn');
+    var buttons = document.querySelectorAll('.timer-btn[data-minutes]');
     for (var i = 0; i < buttons.length; i++) {
       buttons[i].classList.remove('active');
     }
@@ -1276,9 +1623,10 @@ html, body {
 
     if (timerDisplay) timerDisplay.textContent = '未设定';
     if (fadeText) fadeText.classList.remove('visible');
+    if (window.stopMusic) window.stopMusic();
   }
 
-  var timerButtons = document.querySelectorAll('.timer-btn');
+  var timerButtons = document.querySelectorAll('.timer-btn[data-minutes]');
   for (var i = 0; i < timerButtons.length; i++) {
     (function(btn) {
       btn.addEventListener('click', function(e) {
@@ -1354,6 +1702,8 @@ html, body {
         window.setLayerVolume(LAYERS[i], 0);
       }
 
+      if (window.stopMusic) window.stopMusic();
+
       if (window.skyCtx) {
         window.skyCtx.globalAlpha = 0;
       }
@@ -1377,7 +1727,7 @@ html, body {
 
   nightScreen.addEventListener('click', function(e) {
     if (timerState.fadeProgress >= 1) {
-      if (!e.target.closest('.mixer-panel') && !e.target.closest('.timer-section') && !e.target.closest('.mixer-handle')) {
+      if (!e.target.closest('.mixer-panel') && !e.target.closest('.timer-section') && !e.target.closest('.tab-bar') && !e.target.closest('#musicPanel')) {
         cancelTimer();
       }
     }
