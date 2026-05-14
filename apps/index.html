@@ -2,74 +2,112 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>文件导航页</title>
     <style>
+        :root {
+            --primary-bg: linear-gradient(135deg, #667eea, #764ba2);
+            --card-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            --hover-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, Arial;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            font-family: -apple-system, "Noto Sans SC", "Microsoft YaHei", sans-serif;
+            background: var(--primary-bg);
             min-height: 100vh;
-            padding: 40px 20px;
+            padding: 20px; /* 减小默认边距 */
             margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .container {
+            width: 100%;
             max-width: 700px;
-            margin: auto;
+            margin: 20px auto;
         }
 
         h1 {
             color: #fff;
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 24px;
+            font-size: 1.8rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
         .card {
             background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+            border-radius: 16px; /* 更圆润的角 */
+            box-shadow: var(--card-shadow);
             overflow: hidden;
+            transition: box-shadow 0.3s ease;
         }
 
         .item {
             display: flex;
             align-items: center;
-            padding: 14px 18px;
-            border-bottom: 1px solid #eee;
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
             text-decoration: none;
             color: #333;
-            transition: all 0.2s;
+            transition: background 0.2s, transform 0.2s;
+            /* 解决移动端点击高亮 */
+            -webkit-tap-highlight-color: transparent; 
         }
 
         .item:last-child {
             border-bottom: none;
         }
 
-        .item:hover {
-            background: #f5f8ff;
-            transform: translateX(4px);
+        /* 桌面端交互 */
+        @media (min-width: 768px) {
+            .item:hover {
+                background: #f8faff;
+                transform: translateX(6px);
+            }
+            body { padding: 40px 20px; }
+        }
+
+        /* 移动端交互：点击反馈 */
+        .item:active {
+            background: #f0f0f0;
         }
 
         .icon {
-            width: 36px;
-            height: 36px;
-            margin-right: 14px;
-            font-size: 20px;
+            width: 42px;
+            height: 42px;
+            margin-right: 16px;
+            font-size: 22px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 8px;
+            border-radius: 10px;
+            flex-shrink: 0; /* 防止图标被挤压 */
         }
 
-        .html { background: #cce5ff; color: #004085; }
-        .css  { background: #e2d9f3; color: #6f42c1; }
-        .js   { background: #fce4ec; color: #c2185b; }
-        .md   { background: #e8f5e9; color: #2e7d32; }
-        .folder { background: #fff3cd; color: #856404; }
-        .other { background: #f1f1f1; color: #555; }
+        /* 类型颜色保持不变 */
+        .html { background: #e3f2fd; color: #1976d2; }
+        .css  { background: #f3e5f5; color: #7b1fa2; }
+        .js   { background: #fffde7; color: #fbc02d; }
+        .md   { background: #e8f5e9; color: #388e3c; }
+        .folder { background: #fff3e0; color: #f57c00; }
+        .other { background: #f5f5f5; color: #616161; }
 
         .name {
             font-size: 16px;
             font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis; /* 长文件名自动省略号 */
+        }
+
+        /* 针对小屏幕手机的适配 */
+        @media (max-width: 480px) {
+            h1 { font-size: 1.4rem; }
+            .item { padding: 14px 16px; }
+            .icon { width: 36px; height: 36px; font-size: 18px; }
+            .name { font-size: 15px; }
         }
     </style>
 </head>
@@ -79,58 +117,34 @@
     <h1>📂 文件导航</h1>
 
     <div class="card" id="list">
-        <!-- JS 渲染 -->
-    </div>
+        </div>
 </div>
 
 <script>
-/**
- * ✅ 在这里配置你的文件和跳转规则
- */
 const fileList = [
-    {
-        name: "gtmaster",
-        url: "gtmaster.html",
-        type: "html"
-    },
-	{
-        name: "goodnight",
-        url: "goodnight/goodnight.html",
-        type: "html"
-    }
+    { name: "gtmaster", url: "gtmaster.html", type: "html" },
+    { name: "goodnight", url: "goodnight/goodnight.html", type: "html" }
 ];
 
-/**
- * 图标映射
- */
 function getIcon(type) {
     const map = {
-        html: "🌐",
-        css: "🎨",
-        js: "⚡",
-        md: "📝",
-        folder: "📁",
-        other: "📄"
+        html: "🌐", css: "🎨", js: "⚡",
+        md: "📝", folder: "📁", other: "📄"
     };
     return map[type] || map.other;
 }
 
-/**
- * 渲染列表
- */
 const listEl = document.getElementById("list");
 
 fileList.forEach(item => {
-    const div = document.createElement("a");
-    div.className = "item";
-    div.href = item.url;
-
-    div.innerHTML = `
+    const a = document.createElement("a");
+    a.className = "item";
+    a.href = item.url;
+    a.innerHTML = `
         <div class="icon ${item.type}">${getIcon(item.type)}</div>
         <div class="name">${item.name}</div>
     `;
-
-    listEl.appendChild(div);
+    listEl.appendChild(a);
 });
 </script>
 
