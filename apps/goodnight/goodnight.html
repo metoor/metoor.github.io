@@ -637,6 +637,47 @@ html, body {
   }
 
   var isNightMode = false;
+  var bgAudioEl = null;
+
+  function createBgAudio() {
+    if (bgAudioEl) return;
+    // Create a MediaStreamDestination so browser sees "media playing"
+    var dest = window.audioCtx.createMediaStreamDestination();
+    // _master outputs to both speakers (direct) and the MediaStream (for bg keepalive)
+    var master = window.audioCtx.createGain();
+    master.gain.value = 1;
+    master.connect(window.audioCtx.destination);
+    master.connect(dest);
+    window.audioGains._master = master;
+
+    bgAudioEl = new Audio();
+    bgAudioEl.srcObject = dest.stream;
+    bgAudioEl.volume = 0;
+    bgAudioEl.play().catch(function() {});
+
+    // Media Session — tells OS this is intentional media playback
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: 'Goodnight',
+        artist: '晚安'
+      });
+      navigator.mediaSession.playbackState = 'playing';
+    }
+  }
+
+  function handleVisibility() {
+    if (document.visibilityState === 'visible' && isNightMode) {
+      ensureAudioContext();
+      if (window.audioCtx && window.audioCtx.state === 'suspended') {
+        window.audioCtx.resume();
+      }
+      if (bgAudioEl && bgAudioEl.paused) {
+        bgAudioEl.play().catch(function() {});
+      }
+    }
+  }
+  document.addEventListener('visibilitychange', handleVisibility);
+
   var breathScreen = document.getElementById('breath-screen');
   var nightScreen = document.getElementById('night-screen');
   var enterBtn = document.getElementById('enterBtn');
@@ -1027,6 +1068,7 @@ html, body {
     isNightMode = true;
 
     ensureAudioContext();
+    createBgAudio();
     if (window.initAudioLayers) window.initAudioLayers();
     if (window.startSynthesizedLayers) window.startSynthesizedLayers();
     if (window.initMixerSliders) window.initMixerSliders();
@@ -1123,7 +1165,7 @@ html, body {
       var name = layerNames[i];
       var gain = window.audioCtx.createGain();
       gain.gain.value = 0;
-      gain.connect(window.audioCtx.destination);
+      gain.connect(window.audioGains._master);
       window.audioGains[name] = gain;
       window.audioVolumes[name] = 0;
     }
