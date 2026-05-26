@@ -1259,6 +1259,7 @@
             console.log('[Speech] 识别已启动');
             state.isListening = true;
             recognitionRestartCount = 0;
+            restartCount = 0;  // 【修复1】每次成功启动也重置局部计数器
             updateMicUI();
             setStatus('listening', '正在监听语音...');
 
@@ -1314,22 +1315,28 @@
                     setStatus('error', '语音识别不稳定，请使用打字模式');
                     return;
                 }
-                try {
-                    console.log('[Speech] 尝试第', restartCount, '次重启');
-                    recognition.start();
-                } catch(e) {
-                    console.warn('[Speech] 立即重启失败，延迟重试', e);
-                    setTimeout(() => {
-                        if (state.isListening) {
-                            try { recognition.start(); } catch(e2) {
-                                console.error('[Speech] 延迟重启也失败', e2);
-                                state.isListening = false;
-                                updateMicUI();
-                                setStatus('error', '语音识别重启失败');
+                // 退避延迟：随重启次数增加等待更久，避免快速重启雪崩
+                const backoffDelay = Math.min(300 + restartCount * 200, 2000);
+                setTimeout(() => {
+                    if (!state.isListening) return;
+                    try {
+                        console.log('[Speech] 尝试第', restartCount, '次重启 (延迟', backoffDelay, 'ms)');
+                        recognition.start();
+                    } catch(e) {
+                        console.warn('[Speech] 重启失败', e);
+                        // 再延迟一轮重试
+                        setTimeout(() => {
+                            if (state.isListening) {
+                                try { recognition.start(); } catch(e2) {
+                                    console.error('[Speech] 延迟重启也失败', e2);
+                                    state.isListening = false;
+                                    updateMicUI();
+                                    setStatus('error', '语音识别重启失败');
+                                }
                             }
-                        }
-                    }, 800);
-                }
+                        }, 800);
+                    }
+                }, backoffDelay);
             } else {
                 updateMicUI();
             }
@@ -1347,13 +1354,20 @@
                     setStatus('error', '麦克风权限被拒绝');
                     break;
                 case 'network':
-                    // 网络错误 — 在中国大概率是 Google 服务被墙
-                    showToast('语音识别服务连接失败（可能需要科学上网），建议使用打字模式', 'error');
-                    state.isListening = false;
-                    updateMicUI();
-                    setStatus('error', '语音服务不可用，请使用打字模式');
-                    // 自动切换到打字模式
-                    setTimeout(() => switchMode('text'), 1500);
+                    // 【修复2】网络错误增加重试，不立即放弃
+                    console.warn('[Speech] 网络错误, recognitionRestartCount:', recognitionRestartCount);
+                    if (recognitionRestartCount >= 3) {
+                        // 连续多次网络错误才放弃
+                        showToast('语音识别服务持续不可用，已切换到打字模式', 'error');
+                        state.isListening = false;
+                        updateMicUI();
+                        setStatus('error', '语音服务不可用，请使用打字模式');
+                        setTimeout(() => switchMode('text'), 1500);
+                    } else {
+                        // 短暂网络波动，允许 onend 自动重启
+                        console.log('[Speech] 网络波动，允许重试');
+                        setStatus('listening', '网络波动，正在重连...');
+                    }
                     break;
                 case 'service-not-allowed':
                     showToast('语音识别服务不可用，已切换到打字模式', 'error');
@@ -1384,6 +1398,9 @@
             hasReceivedResult = true;
             clearTimeout(noResultTimeout);
             interimTranscript = '';
+            // 【修复3】在成功收到结果时重置重启计数器，避免正常对话耗尽重启次数
+            restartCount = 0;
+            recognitionRestartCount = 0;
 
             for (let i = event.resultIndex; i < event.results.length; i++) {
                 const transcript = event.results[i][0].transcript;
