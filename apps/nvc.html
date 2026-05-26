@@ -1,0 +1,1918 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0f0a1a">
+    <title>和解桥 - 情侣非暴力沟通助手</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* ============ CSS 变量 ============ */
+        :root {
+            --bg-primary: #0f0a1a;
+            --bg-secondary: #1a1128;
+            --bg-card: rgba(42, 28, 58, 0.7);
+            --bg-card-hover: rgba(58, 38, 78, 0.8);
+            --accent-rose: #f472b6;
+            --accent-rose-light: #fb7ebd;
+            --accent-violet: #a78bfa;
+            --accent-violet-light: #c4b5fd;
+            --accent-amber: #fbbf24;
+            --accent-green: #34d399;
+            --accent-blue: #60a5fa;
+            --text-primary: #f8f0ff;
+            --text-secondary: rgba(248, 240, 255, 0.7);
+            --text-muted: rgba(248, 240, 255, 0.4);
+            --border-color: rgba(164, 130, 255, 0.15);
+            --glass-blur: 20px;
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+            --shadow-card: 0 4px 24px rgba(0,0,0,0.3), 0 0 40px rgba(164,130,255,0.06);
+            --shadow-glow: 0 0 30px rgba(244,114,182,0.15);
+            --font-main: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+            --safe-left: env(safe-area-inset-left, 0px);
+            --safe-right: env(safe-area-inset-right, 0px);
+        }
+
+        /* ============ 全局重置 ============ */
+        *, *::before, *::after {
+            margin: 0; padding: 0; box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+            /* 防止 iOS 弹性滚动影响固定定位 */
+            overflow: hidden;
+            height: 100%;
+        }
+        body {
+            font-family: var(--font-main);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            height: 100%;
+            overflow: hidden;
+            line-height: 1.6;
+            /* 使用 dvh 修复 iOS 100vh 问题 */
+            min-height: 100dvh;
+            overscroll-behavior: none;
+            touch-action: manipulation;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        /* ============ 背景氛围 ============ */
+        .atmosphere {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+        }
+        .atmosphere .orb {
+            position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.3;
+            animation: orbFloat 20s ease-in-out infinite;
+            will-change: transform;
+        }
+        .atmosphere .orb:nth-child(1) {
+            width: 400px; height: 400px; background: var(--accent-rose);
+            top: -10%; left: -5%; animation-delay: 0s;
+        }
+        .atmosphere .orb:nth-child(2) {
+            width: 350px; height: 350px; background: var(--accent-violet);
+            bottom: -10%; right: -5%; animation-delay: -7s;
+        }
+        .atmosphere .orb:nth-child(3) {
+            width: 250px; height: 250px; background: var(--accent-blue);
+            top: 40%; left: 50%; animation-delay: -14s; opacity: 0.15;
+        }
+        @keyframes orbFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -20px) scale(1.05); }
+            66% { transform: translate(-20px, 15px) scale(0.95); }
+        }
+
+        /* ============ 主布局 ============ */
+        .app-container {
+            position: relative; z-index: 1;
+            max-width: 900px; margin: 0 auto;
+            /* 适配安全区域 + dvh */
+            height: 100dvh;
+            padding: calc(12px + var(--safe-top)) calc(16px + var(--safe-right)) calc(12px + var(--safe-bottom)) calc(16px + var(--safe-left));
+            display: flex; flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ============ 顶部导航 ============ */
+        .top-bar {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 8px 0; margin-bottom: 10px; flex-shrink: 0;
+        }
+        .logo {
+            display: flex; align-items: center; gap: 10px;
+        }
+        .logo-icon {
+            width: 38px; height: 38px;
+            background: linear-gradient(135deg, var(--accent-rose), var(--accent-violet));
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 0 20px rgba(244,114,182,0.3);
+        }
+        .logo-text {
+            font-size: 1.25rem; font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-rose-light), var(--accent-violet-light));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .logo-sub {
+            font-size: 0.7rem; color: var(--text-muted); letter-spacing: 1px;
+        }
+
+        .top-actions { display: flex; gap: 8px; }
+        .icon-btn {
+            /* 触摸目标 ≥ 44px */
+            min-width: 44px; min-height: 44px;
+            width: 44px; height: 44px; border-radius: 12px;
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            color: var(--text-secondary); font-size: 18px;
+            cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center;
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            touch-action: manipulation;
+        }
+        .icon-btn:active {
+            background: var(--bg-card-hover); color: var(--text-primary);
+            transform: scale(0.94);
+        }
+        .icon-btn:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+        .icon-btn.active { background: linear-gradient(135deg, var(--accent-rose), var(--accent-violet)); color: white; border-color: transparent; }
+
+        /* ============ 状态指示 ============ */
+        .status-bar {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 16px; border-radius: var(--radius-lg);
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            margin-bottom: 10px; font-size: 0.82rem; flex-shrink: 0;
+        }
+        .status-dot {
+            width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+            background: var(--text-muted);
+        }
+        .status-dot.listening {
+            background: var(--accent-green);
+            box-shadow: 0 0 10px rgba(52,211,153,0.5);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        .status-dot.analyzing {
+            background: var(--accent-amber);
+            box-shadow: 0 0 10px rgba(251,191,36,0.5);
+            animation: pulse 1s ease-in-out infinite;
+        }
+        .status-dot.error {
+            background: #ef4444;
+            box-shadow: 0 0 10px rgba(239,68,68,0.5);
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.7; }
+        }
+        .status-text { color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .model-badge {
+            margin-left: auto; padding: 3px 10px; border-radius: 20px;
+            background: rgba(167,139,250,0.15); color: var(--accent-violet-light);
+            font-size: 0.72rem; font-weight: 500; flex-shrink: 0;
+        }
+
+        /* ============ 语音/输入控制面板 ============ */
+        .voice-panel {
+            display: flex; align-items: center;
+            gap: 16px; padding: 16px; margin-bottom: 10px;
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            flex-shrink: 0;
+        }
+        .mic-btn {
+            width: 64px; height: 64px; border-radius: 50%; border: none;
+            background: linear-gradient(135deg, var(--accent-rose), var(--accent-violet));
+            color: white; font-size: 26px; cursor: pointer;
+            transition: all 0.2s; position: relative; flex-shrink: 0;
+            box-shadow: 0 4px 20px rgba(244,114,182,0.3);
+            touch-action: manipulation;
+        }
+        .mic-btn:active { transform: scale(0.94); }
+        .mic-btn:hover { transform: scale(1.05); box-shadow: 0 6px 30px rgba(244,114,182,0.4); }
+        .mic-btn.recording {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            box-shadow: 0 0 0 8px rgba(239,68,68,0.15), 0 4px 20px rgba(239,68,68,0.3);
+            animation: micPulse 1.5s ease-in-out infinite;
+        }
+        @keyframes micPulse {
+            0%, 100% { box-shadow: 0 0 0 8px rgba(239,68,68,0.15), 0 4px 20px rgba(239,68,68,0.3); }
+            50% { box-shadow: 0 0 0 16px rgba(239,68,68,0.05), 0 4px 30px rgba(239,68,68,0.4); }
+        }
+        .mic-btn .ripple {
+            position: absolute; inset: -4px; border-radius: 50%;
+            border: 2px solid var(--accent-rose); opacity: 0;
+        }
+        .mic-btn.recording .ripple { animation: rippleOut 1.5s ease-out infinite; }
+        @keyframes rippleOut {
+            0% { transform: scale(0.8); opacity: 0.6; }
+            100% { transform: scale(1.6); opacity: 0; }
+        }
+        .mic-btn.unsupported {
+            background: var(--bg-card);
+            box-shadow: none;
+            opacity: 0.6;
+        }
+        .voice-right {
+            flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 0;
+        }
+        .voice-info {
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .voice-info h3 { font-size: 0.9rem; font-weight: 600; margin-bottom: 0; }
+        .voice-info p { font-size: 0.75rem; color: var(--text-muted); }
+
+        .live-text {
+            min-height: 40px; padding: 8px 14px;
+            background: rgba(15,10,26,0.5); border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary); font-size: 0.85rem;
+            max-height: 64px; overflow-y: auto;
+            line-height: 1.5;
+            -webkit-overflow-scrolling: touch;
+        }
+        .live-text .cursor {
+            display: inline-block; width: 2px; height: 1em;
+            background: var(--accent-rose); margin-left: 2px;
+            animation: blink 1s step-end infinite; vertical-align: text-bottom;
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* ============ 手动输入区 ============ */
+        .input-panel {
+            display: none; flex-shrink: 0;
+            padding: 10px 0; margin-bottom: 6px;
+        }
+        .input-panel.visible { display: flex; gap: 10px; align-items: flex-end; }
+        .input-row {
+            display: flex; gap: 10px; flex: 1; align-items: flex-end;
+        }
+        .text-input {
+            flex: 1; min-height: 46px; max-height: 120px; padding: 12px 16px;
+            border-radius: var(--radius-lg);
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            color: var(--text-primary); font-size: 16px; /* ≥16px 防止 iOS 自动缩放 */
+            font-family: var(--font-main);
+            resize: none; line-height: 1.5;
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            transition: border-color 0.2s;
+            -webkit-appearance: none;
+        }
+        .text-input:focus {
+            outline: none; border-color: var(--accent-violet);
+            box-shadow: 0 0 0 3px rgba(167,139,250,0.15);
+        }
+        .text-input::placeholder { color: var(--text-muted); }
+        .send-btn {
+            min-width: 46px; min-height: 46px; width: 46px; height: 46px;
+            border-radius: 50%; border: none;
+            background: linear-gradient(135deg, var(--accent-rose), var(--accent-violet));
+            color: white; font-size: 20px; cursor: pointer;
+            transition: all 0.2s; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            touch-action: manipulation;
+        }
+        .send-btn:active { transform: scale(0.94); }
+        .send-btn:hover { transform: scale(1.05); }
+        .send-btn:disabled {
+            opacity: 0.4; cursor: not-allowed; transform: none;
+        }
+
+        /* 输入模式切换标签 */
+        .mode-tabs {
+            display: flex; gap: 0; margin-bottom: 8px;
+            background: var(--bg-card); border-radius: var(--radius-md);
+            border: 1px solid var(--border-color); overflow: hidden;
+        }
+        .mode-tab {
+            flex: 1; padding: 8px 12px; border: none;
+            background: transparent; color: var(--text-muted);
+            font-size: 0.8rem; font-weight: 500; cursor: pointer;
+            transition: all 0.2s; font-family: var(--font-main);
+            touch-action: manipulation;
+        }
+        .mode-tab.active {
+            background: linear-gradient(135deg, var(--accent-rose), var(--accent-violet));
+            color: white;
+        }
+
+        /* ============ 对话流 ============ */
+        .conversation-flow {
+            flex: 1; overflow-y: auto; padding-right: 4px;
+            display: flex; flex-direction: column; gap: 14px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(164,130,255,0.2) transparent;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior-y: contain;
+            /* 给底部留点空间 */
+            padding-bottom: 20px;
+        }
+        .conversation-flow::-webkit-scrollbar { width: 4px; }
+        .conversation-flow::-webkit-scrollbar-thumb { background: rgba(164,130,255,0.2); border-radius: 2px; }
+
+        /* 对话卡片 */
+        .conv-card {
+            border-radius: var(--radius-lg); padding: 16px;
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            box-shadow: var(--shadow-card);
+            animation: cardIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(16px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .conv-card .original-text {
+            position: relative; padding: 12px 16px; margin-bottom: 12px;
+            background: rgba(15,10,26,0.5); border-radius: var(--radius-md);
+            border-left: 3px solid var(--accent-rose);
+            font-size: 0.92rem; line-height: 1.7; color: var(--text-primary);
+        }
+        .conv-card .original-text .label {
+            display: inline-block; font-size: 0.7rem; font-weight: 600;
+            padding: 2px 8px; border-radius: 6px; margin-bottom: 6px;
+            background: rgba(244,114,182,0.15); color: var(--accent-rose-light);
+        }
+        .conv-card .timestamp {
+            font-size: 0.7rem; color: var(--text-muted);
+            float: right; margin-top: -4px;
+        }
+
+        /* NVC 分析区 */
+        .nvc-analysis {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+        }
+        .nvc-item {
+            padding: 10px 12px; border-radius: var(--radius-md);
+            background: rgba(15,10,26,0.4);
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.2s;
+        }
+        .nvc-item .nvc-label {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 1px; margin-bottom: 4px;
+        }
+        .nvc-item .nvc-label .dot {
+            width: 6px; height: 6px; border-radius: 50%;
+        }
+        .nvc-item .nvc-content {
+            font-size: 0.82rem; line-height: 1.55; color: var(--text-secondary);
+        }
+
+        .nvc-observe .dot { background: var(--accent-blue); }
+        .nvc-observe .nvc-label { color: var(--accent-blue); }
+        .nvc-feel .dot { background: var(--accent-rose); }
+        .nvc-feel .nvc-label { color: var(--accent-rose); }
+        .nvc-need .dot { background: var(--accent-amber); }
+        .nvc-need .nvc-label { color: var(--accent-amber); }
+        .nvc-request .dot { background: var(--accent-green); }
+        .nvc-request .nvc-label { color: var(--accent-green); }
+
+        /* 真实意图 & 改进建议 */
+        .nvc-extras {
+            margin-top: 10px; display: flex; flex-direction: column; gap: 8px;
+        }
+        .intent-box, .improve-box {
+            padding: 12px 14px; border-radius: var(--radius-md);
+        }
+        .intent-box {
+            background: linear-gradient(135deg, rgba(244,114,182,0.1), rgba(167,139,250,0.1));
+            border: 1px solid rgba(244,114,182,0.15);
+        }
+        .improve-box {
+            background: linear-gradient(135deg, rgba(52,211,153,0.08), rgba(96,165,250,0.08));
+            border: 1px solid rgba(52,211,153,0.12);
+        }
+        .intent-box .extra-label, .improve-box .extra-label {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 0.75rem; font-weight: 600; margin-bottom: 6px;
+        }
+        .intent-box .extra-label { color: var(--accent-rose-light); }
+        .improve-box .extra-label { color: var(--accent-green); }
+        .intent-box .extra-content, .improve-box .extra-content {
+            font-size: 0.85rem; line-height: 1.7; color: var(--text-secondary);
+        }
+
+        /* ============ 空状态 ============ */
+        .empty-state {
+            flex: 1; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; gap: 14px;
+            padding: 40px 20px; text-align: center;
+        }
+        .empty-icon {
+            font-size: 56px; opacity: 0.3;
+            animation: floatEmoji 3s ease-in-out infinite;
+        }
+        @keyframes floatEmoji {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        .empty-title { font-size: 1.05rem; font-weight: 600; color: var(--text-secondary); }
+        .empty-desc { font-size: 0.82rem; color: var(--text-muted); max-width: 320px; line-height: 1.7; }
+
+        /* ============ 设置面板 ============ */
+        .settings-overlay {
+            position: fixed; inset: 0; z-index: 100;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex; align-items: flex-end; justify-content: center;
+            opacity: 0; pointer-events: none; transition: all 0.3s;
+        }
+        .settings-overlay.open { opacity: 1; pointer-events: auto; }
+        .settings-panel {
+            width: 100%; max-width: 520px; max-height: 90dvh;
+            background: var(--bg-secondary); border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            border: 1px solid var(--border-color);
+            border-bottom: none;
+            box-shadow: 0 -10px 60px rgba(0,0,0,0.5);
+            overflow-y: auto; padding: 20px 24px calc(20px + var(--safe-bottom));
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            -webkit-overflow-scrolling: touch;
+        }
+        .settings-overlay.open .settings-panel { transform: translateY(0); }
+        .settings-drag-handle {
+            width: 36px; height: 4px; border-radius: 2px;
+            background: rgba(255,255,255,0.15); margin: 0 auto 16px;
+        }
+        .settings-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .settings-header h2 { font-size: 1.1rem; font-weight: 700; }
+        .settings-close {
+            min-width: 44px; min-height: 44px; width: 44px; height: 44px;
+            border-radius: 12px; border: none;
+            background: var(--bg-card); color: var(--text-secondary);
+            font-size: 18px; cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center;
+            touch-action: manipulation;
+        }
+        .settings-close:active { background: var(--bg-card-hover); color: var(--text-primary); transform: scale(0.94); }
+
+        .setting-group { margin-bottom: 18px; }
+        .setting-group label {
+            display: block; font-size: 0.82rem; font-weight: 600;
+            color: var(--text-secondary); margin-bottom: 8px;
+        }
+        .setting-group input, .setting-group select, .setting-group textarea {
+            width: 100%; padding: 12px 14px; border-radius: var(--radius-md);
+            background: rgba(15,10,26,0.5); border: 1px solid var(--border-color);
+            color: var(--text-primary); font-size: 16px; /* ≥16px 防止 iOS 自动缩放 */
+            font-family: var(--font-main); transition: all 0.2s;
+            -webkit-appearance: none;
+        }
+        .setting-group input:focus, .setting-group select:focus, .setting-group textarea:focus {
+            outline: none; border-color: var(--accent-violet);
+            box-shadow: 0 0 0 3px rgba(167,139,250,0.15);
+        }
+        .setting-group textarea { min-height: 80px; resize: vertical; line-height: 1.5; }
+        .setting-group .hint {
+            font-size: 0.72rem; color: var(--text-muted); margin-top: 4px;
+        }
+
+        /* 模型切换 */
+        .model-switcher {
+            display: flex; gap: 6px; margin-bottom: 18px;
+        }
+        .model-option {
+            flex: 1; padding: 12px 8px; border-radius: var(--radius-md);
+            background: var(--bg-card); border: 2px solid var(--border-color);
+            cursor: pointer; text-align: center; transition: all 0.2s;
+            touch-action: manipulation;
+        }
+        .model-option:active { transform: scale(0.96); }
+        .model-option.selected {
+            border-color: var(--accent-violet);
+            background: rgba(167,139,250,0.1);
+            box-shadow: 0 0 20px rgba(167,139,250,0.1);
+        }
+        .model-option .model-name {
+            font-size: 0.88rem; font-weight: 600; margin-bottom: 2px;
+        }
+        .model-option .model-desc {
+            font-size: 0.68rem; color: var(--text-muted);
+        }
+
+        .save-btn {
+            width: 100%; padding: 14px; border-radius: var(--radius-md);
+            background: linear-gradient(135deg, var(--accent-rose), var(--accent-violet));
+            color: white; border: none; font-size: 16px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+            font-family: var(--font-main);
+            min-height: 50px;
+            touch-action: manipulation;
+        }
+        .save-btn:active { transform: scale(0.97); }
+        .save-btn:hover { box-shadow: 0 6px 20px rgba(244,114,182,0.3); }
+
+        /* ============ Toast 通知 ============ */
+        .toast-container {
+            position: fixed; top: calc(16px + var(--safe-top)); left: 16px; right: 16px; z-index: 200;
+            display: flex; flex-direction: column; gap: 8px;
+            pointer-events: none;
+        }
+        .toast {
+            padding: 12px 18px; border-radius: var(--radius-md);
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            font-size: 0.85rem; color: var(--text-primary);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+            animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: auto;
+        }
+        .toast.error { border-color: rgba(239,68,68,0.3); }
+        .toast.success { border-color: rgba(52,211,153,0.3); }
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ============ 加载动画 ============ */
+        .analyzing-indicator {
+            display: flex; align-items: center; gap: 6px;
+            padding: 8px 14px; border-radius: var(--radius-md);
+            background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.12);
+            font-size: 0.78rem; color: var(--accent-amber);
+            animation: cardIn 0.3s ease;
+        }
+        .analyzing-indicator .dots span {
+            display: inline-block; width: 4px; height: 4px;
+            border-radius: 50%; background: var(--accent-amber);
+            animation: dotBounce 1.4s ease-in-out infinite;
+        }
+        .analyzing-indicator .dots span:nth-child(2) { animation-delay: 0.2s; }
+        .analyzing-indicator .dots span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes dotBounce {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        /* ============ 无障碍 & 减少动效 ============ */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* ============ 响应式 - 平板 ============ */
+        @media (min-width: 768px) {
+            .settings-overlay {
+                align-items: center; justify-content: center;
+            }
+            .settings-panel {
+                border-radius: var(--radius-xl);
+                border-bottom: 1px solid var(--border-color);
+                max-height: 85dvh;
+            }
+            .settings-drag-handle { display: none; }
+        }
+
+        /* ============ 响应式 - 手机竖屏 ============ */
+        @media (max-width: 640px) {
+            .app-container {
+                padding: calc(8px + var(--safe-top)) 10px calc(8px + var(--safe-bottom)) 10px;
+            }
+            .top-bar { padding: 4px 0; margin-bottom: 6px; }
+            .logo-icon { width: 34px; height: 34px; font-size: 16px; }
+            .logo-text { font-size: 1.1rem; }
+            .logo-sub { font-size: 0.65rem; }
+            .voice-panel { padding: 12px; gap: 12px; }
+            .mic-btn { width: 56px; height: 56px; font-size: 22px; }
+            .status-bar { padding: 8px 12px; margin-bottom: 6px; font-size: 0.78rem; gap: 8px; }
+            .conv-card { padding: 14px; }
+            .conv-card .original-text { padding: 10px 12px; font-size: 0.88rem; }
+            .nvc-analysis { grid-template-columns: 1fr 1fr; gap: 6px; }
+            .nvc-item { padding: 8px 10px; }
+            .nvc-item .nvc-content { font-size: 0.78rem; }
+            .intent-box, .improve-box { padding: 10px 12px; }
+            .intent-box .extra-content, .improve-box .extra-content { font-size: 0.82rem; }
+        }
+
+        /* ============ 响应式 - 超小屏 (<375px) ============ */
+        @media (max-width: 374px) {
+            .nvc-analysis { grid-template-columns: 1fr; }
+            .voice-panel { flex-direction: column; align-items: stretch; }
+            .voice-info { text-align: center; }
+            .mode-tabs { max-width: 100%; }
+        }
+
+        /* ============ 响应式 - 横屏手机 ============ */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .app-container { padding: 4px 10px; }
+            .top-bar { padding: 2px 0; margin-bottom: 4px; }
+            .status-bar { padding: 4px 12px; margin-bottom: 4px; font-size: 0.75rem; }
+            .voice-panel { padding: 8px 12px; margin-bottom: 4px; }
+            .mic-btn { width: 48px; height: 48px; font-size: 20px; }
+            .live-text { min-height: 32px; max-height: 48px; }
+            .empty-state { padding: 20px; }
+            .empty-icon { font-size: 36px; }
+        }
+
+        /* ============ 桌面端设置面板还原 ============ */
+        @media (min-width: 641px) {
+            .settings-overlay { align-items: center; }
+            .settings-panel {
+                border-radius: var(--radius-xl);
+                border-bottom: 1px solid var(--border-color);
+                max-height: 85dvh;
+                transform: translateY(20px) scale(0.97);
+            }
+            .settings-overlay.open .settings-panel { transform: translateY(0) scale(1); }
+            .settings-drag-handle { display: none; }
+            .voice-panel { padding: 20px; }
+            .mic-btn { width: 72px; height: 72px; font-size: 28px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景氛围 -->
+    <div class="atmosphere">
+        <div class="orb"></div>
+        <div class="orb"></div>
+        <div class="orb"></div>
+    </div>
+
+    <!-- Toast 通知容器 -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- 设置面板 -->
+    <div class="settings-overlay" id="settingsOverlay">
+        <div class="settings-panel">
+            <div class="settings-drag-handle"></div>
+            <div class="settings-header">
+                <h2>⚙️ 设置</h2>
+                <button class="settings-close" onclick="toggleSettings()">✕</button>
+            </div>
+
+            <!-- 模型选择 -->
+            <div class="model-switcher" id="modelSwitcher">
+                <div class="model-option selected" data-model="deepseek" onclick="selectModel('deepseek')">
+                    <div class="model-name">DeepSeek</div>
+                    <div class="model-desc">深度求索</div>
+                </div>
+                <div class="model-option" data-model="qwen" onclick="selectModel('qwen')">
+                    <div class="model-name">通义千问</div>
+                    <div class="model-desc">Qwen</div>
+                </div>
+                <div class="model-option" data-model="custom" onclick="selectModel('custom')">
+                    <div class="model-name">自定义</div>
+                    <div class="model-desc">OpenAI 兼容</div>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <label>API Base URL</label>
+                <input type="url" id="apiBase" placeholder="https://api.deepseek.com/v1" autocomplete="off">
+                <div class="hint">DeepSeek: https://api.deepseek.com/v1 | 千问: https://dashscope.aliyuncs.com/compatible-mode/v1</div>
+            </div>
+            <div class="setting-group">
+                <label>API Key</label>
+                <input type="password" id="apiKey" placeholder="sk-xxxxxxxxxxxxxxxx" autocomplete="off">
+                <div class="hint">密钥仅在本地使用，不会上传到任何服务器</div>
+            </div>
+            <div class="setting-group">
+                <label>模型名称</label>
+                <input type="text" id="modelName" placeholder="deepseek-chat" autocomplete="off">
+                <div class="hint">DeepSeek: deepseek-chat | 千问: qwen-plus</div>
+            </div>
+            <div class="setting-group">
+                <label>系统提示词（可选自定义）</label>
+                <textarea id="systemPrompt" placeholder="留空使用默认非暴力沟通提示词..."></textarea>
+            </div>
+
+            <button class="save-btn" onclick="saveSettings()">💾 保存设置</button>
+        </div>
+    </div>
+
+    <!-- 主容器 -->
+    <div class="app-container">
+        <!-- 顶部栏 -->
+        <div class="top-bar">
+            <div class="logo">
+                <div class="logo-icon">🌉</div>
+                <div>
+                    <div class="logo-text">和解桥</div>
+                    <div class="logo-sub">非暴力沟通助手</div>
+                </div>
+            </div>
+            <div class="top-actions">
+                <button class="icon-btn" onclick="toggleDebug()" title="调试">🔧</button>
+                <button class="icon-btn" onclick="clearHistory()" title="清空记录">🗑️</button>
+                <button class="icon-btn" onclick="toggleSettings()" title="设置">⚙️</button>
+            </div>
+        </div>
+
+        <!-- 状态栏 -->
+        <div class="status-bar">
+            <div class="status-dot" id="statusDot"></div>
+            <span class="status-text" id="statusText">准备就绪</span>
+            <span class="model-badge" id="modelBadge">未配置</span>
+        </div>
+
+        <!-- 输入模式切换 -->
+        <div class="mode-tabs" id="modeTabs">
+            <button class="mode-tab active" data-mode="voice" onclick="switchMode('voice')">🎤 语音</button>
+            <button class="mode-tab" data-mode="text" onclick="switchMode('text')">✏️ 打字</button>
+        </div>
+
+        <!-- 语音控制面板 -->
+        <div class="voice-panel" id="voicePanel">
+            <button class="mic-btn" id="micBtn" onclick="toggleListening()">
+                <span class="ripple"></span>
+                🎤
+            </button>
+            <div class="voice-right">
+                <div class="voice-info">
+                    <div>
+                        <h3 id="micLabel">点击开始监听</h3>
+                        <p id="micDesc">实时语音识别 · 自动分析</p>
+                    </div>
+                </div>
+                <div class="live-text" id="liveText">
+                    <span class="cursor"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 手动输入面板 -->
+        <div class="input-panel" id="inputPanel">
+            <div class="input-row">
+                <textarea class="text-input" id="textInput" placeholder="输入你想说的话..." rows="1"></textarea>
+                <button class="send-btn" id="sendBtn" onclick="sendText()" disabled>➤</button>
+            </div>
+        </div>
+
+        <!-- 对话流 -->
+        <div class="conversation-flow" id="conversationFlow">
+            <div class="empty-state" id="emptyState">
+                <div class="empty-icon">💬</div>
+                <div class="empty-title">开始你们的对话</div>
+                <div class="empty-desc">
+                    说出或输入你想表达的话，<br>
+                    我会用非暴力沟通的方式，帮你理解话语背后的真实意图，并给出更好的表达建议。
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // ============================================================
+    //  和解桥 - 情侣非暴力沟通助手（移动端适配版）
+    //  核心模块：语音识别 · 文本输入降级 · 大模型分析 · NVC 解析
+    // ============================================================
+
+    // ---------- 环境检测 ----------
+    const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    const hasSpeechAPI = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+    const isSecureContext = window.isSecureContext;
+    const isFileProtocol = location.protocol === 'file:';
+
+    // ---------- 状态管理 ----------
+    const state = {
+        isListening: false,
+        isAnalyzing: false,
+        recognition: null,
+        currentModel: 'deepseek',
+        inputMode: hasSpeechAPI ? 'voice' : 'text',  // 无语音API时默认文本模式
+        config: {
+            deepseek: {
+                apiBase: 'https://api.deepseek.com/v1',
+                apiKey: '',
+                modelName: 'deepseek-chat'
+            },
+            qwen: {
+                apiBase: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+                apiKey: '',
+                modelName: 'qwen-plus'
+            },
+            custom: {
+                apiBase: '',
+                apiKey: '',
+                modelName: ''
+            }
+        },
+        customSystemPrompt: '',
+        pendingText: '',
+        conversationHistory: []
+    };
+
+    // ---------- NVC 默认系统提示词 ----------
+    const DEFAULT_NVC_PROMPT = `你是一位精通非暴力沟通（NVC）的情感沟通专家，专门帮助情侣在争吵中理解彼此、化解冲突。
+
+你的任务：分析用户说出的每一句话，用非暴力沟通的四要素框架进行拆解，并给出建设性的改进建议。
+
+请严格按照以下 JSON 格式输出（不要输出任何其他内容）：
+{
+  "observe": "客观观察：描述事实，不加评判",
+  "feel": "感受识别：说话者可能的真实情绪",
+  "need": "需要洞察：话语背后未被满足的核心需要",
+  "request": "请求转化：如果用非暴力沟通方式，可以怎样表达请求",
+  "true_intent": "真实意图：透过表面话语，说话者真正想表达什么",
+  "improved": "改进建议：用温和且有效的方式重新表达这句话"
+}
+
+分析原则：
+1. 观察：只描述事实，不加主观评判和指责
+2. 感受：识别表面情绪和深层情绪（如愤怒背后可能是受伤或害怕）
+3. 需要：洞察话语中暗示的核心需要（被重视、安全感、陪伴、理解等）
+4. 请求：将命令/指责转化为具体的、正向的请求
+5. 真实意图：透过指责、抱怨、沉默等表面行为，识别内心真实的渴望
+6. 改进建议：用"我感到…因为我需要…你是否愿意…"的句式重新组织
+
+注意：保持温和、不评判的语调，帮助双方看到彼此的需要，而非分对错。`;
+
+    // ---------- 输入模式切换 ----------
+    function switchMode(mode) {
+        state.inputMode = mode;
+        document.querySelectorAll('.mode-tab').forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.mode === mode);
+        });
+
+        const voicePanel = document.getElementById('voicePanel');
+        const inputPanel = document.getElementById('inputPanel');
+
+        if (mode === 'voice') {
+            voicePanel.style.display = 'flex';
+            inputPanel.classList.remove('visible');
+        } else {
+            voicePanel.style.display = 'none';
+            inputPanel.classList.add('visible');
+            // 停止语音监听
+            if (state.isListening) {
+                state.isListening = false;
+                if (state.recognition) {
+                    try { state.recognition.stop(); } catch(e) {}
+                }
+                updateMicUI();
+            }
+            // 聚焦输入框
+            setTimeout(() => {
+                document.getElementById('textInput').focus();
+            }, 100);
+        }
+    }
+
+    // ---------- 语音识别模块 ----------
+    let recognitionRestartCount = 0;
+    const MAX_RESTART_ATTEMPTS = 5;
+    let noResultTimeout = null;
+
+    function initSpeechRecognition() {
+        if (!hasSpeechAPI) {
+            showToast('您的浏览器不支持语音识别，已切换到打字模式', 'error');
+            switchMode('text');
+            const voiceTab = document.querySelector('.mode-tab[data-mode="voice"]');
+            if (voiceTab) {
+                voiceTab.style.opacity = '0.4';
+                voiceTab.title = '当前浏览器不支持语音识别';
+            }
+            return false;
+        }
+
+        // 安全上下文检测
+        if (!isSecureContext && !isFileProtocol) {
+            showToast('语音识别需要 HTTPS 或本地环境，已切换到打字模式', 'error');
+            switchMode('text');
+            return false;
+        }
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = 'zh-CN';
+        recognition.maxAlternatives = 1;
+
+        let finalTranscript = '';
+        let interimTranscript = '';
+        let silenceTimer = null;
+        let hasReceivedResult = false;
+        let restartCount = 0;
+
+        recognition.onstart = () => {
+            console.log('[Speech] 识别已启动');
+            state.isListening = true;
+            recognitionRestartCount = 0;
+            updateMicUI();
+            setStatus('listening', '正在监听语音...');
+
+            // 超时检测：8秒没收到任何结果则提示
+            clearTimeout(noResultTimeout);
+            if (!hasReceivedResult) {
+                noResultTimeout = setTimeout(() => {
+                    if (state.isListening && !hasReceivedResult) {
+                        console.warn('[Speech] 启动8秒未收到识别结果');
+                        setStatus('listening', '监听中（等待语音）...');
+                        showToast('未检测到语音，请确认麦克风正常并靠近说话', 'error');
+                    }
+                }, 8000);
+            }
+        };
+
+        recognition.onaudiostart = () => {
+            console.log('[Speech] 音频捕获开始');
+            setStatus('listening', '🎤 检测到音频输入...');
+        };
+
+        recognition.onsoundstart = () => {
+            console.log('[Speech] 检测到声音');
+            setStatus('listening', '🎤 检测到声音...');
+        };
+
+        recognition.onspeechstart = () => {
+            console.log('[Speech] 检测到语音');
+            setStatus('listening', '🎤 正在识别语音...');
+        };
+
+        recognition.onspeechend = () => {
+            console.log('[Speech] 语音结束');
+            if (state.isListening) {
+                setStatus('listening', '处理中...');
+            }
+        };
+
+        recognition.onend = () => {
+            console.log('[Speech] 识别会话结束, isListening:', state.isListening, ', restartCount:', restartCount);
+            clearTimeout(noResultTimeout);
+
+            if (state.isListening) {
+                // 限制自动重启次数，防止死循环
+                restartCount++;
+                recognitionRestartCount++;
+                if (restartCount > MAX_RESTART_ATTEMPTS) {
+                    console.error('[Speech] 超过最大重启次数，停止自动重启');
+                    showToast('语音识别频繁断开，已切换到打字模式', 'error');
+                    state.isListening = false;
+                    switchMode('text');
+                    updateMicUI();
+                    setStatus('error', '语音识别不稳定，请使用打字模式');
+                    return;
+                }
+                try {
+                    console.log('[Speech] 尝试第', restartCount, '次重启');
+                    recognition.start();
+                } catch(e) {
+                    console.warn('[Speech] 立即重启失败，延迟重试', e);
+                    setTimeout(() => {
+                        if (state.isListening) {
+                            try { recognition.start(); } catch(e2) {
+                                console.error('[Speech] 延迟重启也失败', e2);
+                                state.isListening = false;
+                                updateMicUI();
+                                setStatus('error', '语音识别重启失败');
+                            }
+                        }
+                    }, 800);
+                }
+            } else {
+                updateMicUI();
+            }
+        };
+
+        recognition.onerror = (event) => {
+            console.error('[Speech] 识别错误:', event.error, event.message);
+            clearTimeout(noResultTimeout);
+
+            switch (event.error) {
+                case 'not-allowed':
+                    showToast('请允许麦克风权限以使用语音识别', 'error');
+                    state.isListening = false;
+                    updateMicUI();
+                    setStatus('error', '麦克风权限被拒绝');
+                    break;
+                case 'network':
+                    // 网络错误 — 在中国大概率是 Google 服务被墙
+                    showToast('语音识别服务连接失败（可能需要科学上网），建议使用打字模式', 'error');
+                    state.isListening = false;
+                    updateMicUI();
+                    setStatus('error', '语音服务不可用，请使用打字模式');
+                    // 自动切换到打字模式
+                    setTimeout(() => switchMode('text'), 1500);
+                    break;
+                case 'service-not-allowed':
+                    showToast('语音识别服务不可用，已切换到打字模式', 'error');
+                    state.isListening = false;
+                    updateMicUI();
+                    switchMode('text');
+                    break;
+                case 'no-speech':
+                    // 静默，不做处理，让 onend 自动重启
+                    console.log('[Speech] 无语音输入');
+                    break;
+                case 'aborted':
+                    // 主动中断，不处理
+                    break;
+                case 'audio-capture':
+                    showToast('未找到麦克风设备，请检查硬件', 'error');
+                    state.isListening = false;
+                    updateMicUI();
+                    switchMode('text');
+                    break;
+                default:
+                    console.warn('[Speech] 未处理的错误类型:', event.error);
+                    break;
+            }
+        };
+
+        recognition.onresult = (event) => {
+            hasReceivedResult = true;
+            clearTimeout(noResultTimeout);
+            interimTranscript = '';
+
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const transcript = event.results[i][0].transcript;
+                if (event.results[i].isFinal) {
+                    finalTranscript += transcript;
+                    console.log('[Speech] Final:', transcript);
+                } else {
+                    interimTranscript += transcript;
+                }
+            }
+
+            const liveText = document.getElementById('liveText');
+            const displayText = finalTranscript + interimTranscript;
+            if (displayText) {
+                liveText.innerHTML = escapeHtml(displayText) + '<span class="cursor"></span>';
+                setStatus('listening', '🎤 识别到语音...');
+            }
+
+            clearTimeout(silenceTimer);
+            silenceTimer = setTimeout(() => {
+                // 提交条件：有 final 结果，或者 interim 结果超过3秒没变化
+                const textToSend = finalTranscript.trim() || interimTranscript.trim();
+                if (textToSend && !state.isAnalyzing) {
+                    console.log('[Speech] 静默超时，提交分析:', textToSend);
+                    finalTranscript = '';
+                    interimTranscript = '';
+                    liveText.innerHTML = '<span class="cursor"></span>';
+                    analyzeText(textToSend);
+                }
+            }, 1800);
+        };
+
+        state.recognition = recognition;
+        return true;
+    }
+
+    function toggleListening() {
+        if (state.isAnalyzing) {
+            showToast('正在分析中，请稍候...', 'error');
+            return;
+        }
+
+        if (!state.recognition) {
+            if (!initSpeechRecognition()) return;
+        }
+
+        if (state.isListening) {
+            // 停止监听
+            state.isListening = false;
+            recognitionRestartCount = 0;
+            try { state.recognition.stop(); } catch(e) {}
+            setStatus('', '语音识别已暂停');
+        } else {
+            // 检查 API 配置
+            const currentConfig = getCurrentConfig();
+            if (!currentConfig.apiKey) {
+                showToast('请先在设置中配置 API Key', 'error');
+                toggleSettings();
+                return;
+            }
+            // 启动监听 — 注意：先不设 isListening，等 onstart 回调再设
+            try {
+                state.recognition.start();
+                // isListening 在 onstart 回调中设置
+                setStatus('listening', '正在启动语音识别...');
+            } catch(e) {
+                console.error('[Speech] 启动失败:', e);
+                // 可能已经在运行，先停止再启动
+                try { state.recognition.stop(); } catch(e2) {}
+                setTimeout(() => {
+                    try {
+                        state.recognition.start();
+                    } catch(e3) {
+                        showToast('语音识别启动失败，请刷新页面重试', 'error');
+                        setStatus('error', '启动失败');
+                    }
+                }, 500);
+            }
+        }
+        updateMicUI();
+    }
+
+    function updateMicUI() {
+        const btn = document.getElementById('micBtn');
+        const label = document.getElementById('micLabel');
+        const desc = document.getElementById('micDesc');
+
+        if (!hasSpeechAPI) {
+            btn.classList.add('unsupported');
+            label.textContent = '语音不可用';
+            desc.textContent = '请使用打字模式输入';
+            return;
+        }
+
+        if (state.isListening) {
+            btn.classList.add('recording');
+            label.textContent = '正在监听...';
+            desc.textContent = '说话后自动分析 · 点击暂停';
+        } else {
+            btn.classList.remove('recording');
+            label.textContent = '点击开始监听';
+            desc.textContent = '实时语音识别 · 自动分析';
+        }
+    }
+
+    // ---------- 文本输入处理 ----------
+    function initTextInput() {
+        const textInput = document.getElementById('textInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        // 自动调整高度
+        textInput.addEventListener('input', () => {
+            textInput.style.height = 'auto';
+            textInput.style.height = Math.min(textInput.scrollHeight, 120) + 'px';
+            sendBtn.disabled = !textInput.value.trim();
+        });
+
+        // Enter 发送（Shift+Enter 换行）
+        textInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendText();
+            }
+        });
+    }
+
+    function sendText() {
+        const textInput = document.getElementById('textInput');
+        const text = textInput.value.trim();
+        if (!text || state.isAnalyzing) return;
+
+        // 检查 API 配置
+        const currentConfig = getCurrentConfig();
+        if (!currentConfig.apiKey) {
+            showToast('请先在设置中配置 API Key', 'error');
+            toggleSettings();
+            return;
+        }
+
+        textInput.value = '';
+        textInput.style.height = 'auto';
+        document.getElementById('sendBtn').disabled = true;
+
+        analyzeText(text);
+    }
+
+    // ---------- 大模型调用模块 ----------
+    function getCurrentConfig() {
+        return state.config[state.currentModel];
+    }
+
+    async function callLLM(userText) {
+        const config = getCurrentConfig();
+        if (!config.apiKey) {
+            throw new Error('未配置 API Key，请在设置中填写');
+        }
+
+        if (!config.apiBase) {
+            throw new Error('未配置 API 地址，请在设置中填写');
+        }
+
+        const systemPrompt = state.customSystemPrompt || DEFAULT_NVC_PROMPT;
+        const apiBase = config.apiBase.replace(/\/$/, '');
+
+        // 检测 file:// 协议下的 CORS 问题
+        if (location.protocol === 'file:') {
+            debugLog(`⚠️ 当前为 file:// 协议，可能存在 CORS 限制`);
+            debugLog(`正在尝试请求: ${apiBase}/chat/completions`);
+        }
+
+        const requestBody = {
+            model: config.modelName,
+            messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: `请分析这句话："${userText}"` }
+            ],
+            temperature: 0.7,
+            max_tokens: 800
+        };
+
+        // 只有 deepseek-chat 明确支持 json_object，其他模型可能不支持
+        // 改为通过 prompt 约束输出格式，而非 response_format 参数
+        debugLog(`API 请求: ${apiBase}/chat/completions | model: ${config.modelName}`);
+
+        let response;
+        try {
+            response = await fetch(`${apiBase}/chat/completions`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${config.apiKey}`
+                },
+                body: JSON.stringify(requestBody)
+            });
+        } catch (fetchError) {
+            debugLog(`❌ fetch 失败: ${fetchError.message}`);
+            // 网络错误分类
+            if (fetchError.name === 'TypeError' && fetchError.message === 'Failed to fetch') {
+                if (location.protocol === 'file:') {
+                    throw new Error('网络请求失败：当前通过文件直接打开（file://），浏览器会阻止跨域请求。\n\n💡 解决方案：\n1. 使用下方的"启动本地服务器"按钮\n2. 或通过 VS Code Live Server 打开\n3. 或部署到 HTTPS 服务器');
+                }
+                throw new Error('网络请求失败：无法连接到 API 服务。\n\n可能原因：\n1. API 地址不正确\n2. 网络不通或需要代理\n3. CORS 跨域限制');
+            }
+            throw new Error(`网络错误: ${fetchError.message}`);
+        }
+
+        debugLog(`API 响应状态: ${response.status}`);
+
+        if (!response.ok) {
+            let errorDetail = '';
+            try {
+                errorDetail = await response.text();
+                debugLog(`API 错误响应: ${errorDetail.substring(0, 500)}`);
+            } catch(e) {
+                errorDetail = '(无法读取错误详情)';
+            }
+
+            // 友好化常见错误
+            if (response.status === 401 || response.status === 403) {
+                throw new Error('API Key 无效或已过期，请检查设置中的 API Key');
+            }
+            if (response.status === 404) {
+                throw new Error(`API 地址不正确 (404)，请检查 API Base URL 是否正确\n当前地址: ${apiBase}`);
+            }
+            if (response.status === 429) {
+                throw new Error('API 请求频率超限，请稍后再试');
+            }
+            if (response.status === 400) {
+                // 可能是模型名称错误或参数不支持
+                try {
+                    const errJson = JSON.parse(errorDetail);
+                    const errMsg = errJson.error?.message || errJson.message || errorDetail.substring(0, 200);
+                    throw new Error(`请求参数错误 (400): ${errMsg}`);
+                } catch(jsonErr) {
+                    if (jsonErr.message.startsWith('请求参数错误')) throw jsonErr;
+                    throw new Error(`请求参数错误 (400): ${errorDetail.substring(0, 200)}`);
+                }
+            }
+            if (response.status === 500 || response.status === 502 || response.status === 503) {
+                throw new Error('API 服务暂时不可用，请稍后重试');
+            }
+            throw new Error(`API 请求失败 (${response.status}): ${errorDetail.substring(0, 200)}`);
+        }
+
+        let data;
+        try {
+            data = await response.json();
+        } catch(e) {
+            debugLog(`❌ JSON 解析失败: ${e.message}`);
+            throw new Error('API 返回的不是有效的 JSON 格式');
+        }
+
+        const content = data.choices?.[0]?.message?.content;
+        debugLog(`模型输出: ${content ? content.substring(0, 100) + '...' : '(空)'}`);
+
+        if (!content) {
+            debugLog(`❌ API 完整响应: ${JSON.stringify(data).substring(0, 500)}`);
+            throw new Error('API 返回内容为空，请检查模型名称是否正确');
+        }
+
+        // 尝试解析 JSON
+        try {
+            return JSON.parse(content);
+        } catch {
+            // 尝试从文本中提取 JSON
+            const jsonMatch = content.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                try {
+                    return JSON.parse(jsonMatch[0]);
+                } catch(e2) {
+                    debugLog(`❌ JSON 提取解析失败: ${e2.message}`);
+                }
+            }
+            debugLog(`❌ 无法解析模型输出，原始内容: ${content.substring(0, 300)}`);
+            throw new Error('模型未返回 JSON 格式，请尝试调整模型或 System Prompt');
+        }
+    }
+
+    // ---------- NVC 分析 & 渲染 ----------
+    async function analyzeText(text) {
+        if (state.isAnalyzing) return;
+        state.isAnalyzing = true;
+        setStatus('analyzing', '正在分析...');
+
+        const emptyState = document.getElementById('emptyState');
+        if (emptyState) emptyState.remove();
+
+        const flow = document.getElementById('conversationFlow');
+        const indicator = document.createElement('div');
+        indicator.className = 'analyzing-indicator';
+        indicator.id = 'analyzingIndicator';
+        indicator.innerHTML = `🔍 正在分析：${text.substring(0, 24)}${text.length > 24 ? '...' : ''} <span class="dots"><span></span><span></span><span></span></span>`;
+        flow.appendChild(indicator);
+        scrollFlowToBottom();
+
+        try {
+            const result = await callLLM(text);
+            indicator.remove();
+            renderAnalysisCard(text, result);
+            setStatus(state.isListening ? 'listening' : '准备就绪', state.isListening ? '正在监听语音...' : '准备就绪');
+        } catch (error) {
+            indicator.remove();
+            console.error('分析失败:', error);
+            showToast(`分析失败：${error.message}`, 'error');
+            renderErrorCard(text, error.message);
+            setStatus(state.isListening ? 'listening' : '', state.isListening ? '正在监听语音...' : '分析失败');
+        } finally {
+            state.isAnalyzing = false;
+        }
+    }
+
+    function scrollFlowToBottom() {
+        const flow = document.getElementById('conversationFlow');
+        // 使用 requestAnimationFrame 确保在 DOM 更新后滚动
+        requestAnimationFrame(() => {
+            flow.scrollTop = flow.scrollHeight;
+        });
+    }
+
+    function renderAnalysisCard(originalText, nvc) {
+        const flow = document.getElementById('conversationFlow');
+        const now = new Date();
+        const timeStr = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+
+        const card = document.createElement('div');
+        card.className = 'conv-card';
+        card.innerHTML = `
+            <div class="original-text">
+                <span class="label">🗣️ 原话</span>
+                <span class="timestamp">${timeStr}</span>
+                <br>${escapeHtml(originalText)}
+            </div>
+            <div class="nvc-analysis">
+                <div class="nvc-item nvc-observe">
+                    <div class="nvc-label"><span class="dot"></span>观察</div>
+                    <div class="nvc-content">${escapeHtml(nvc.observe || '—')}</div>
+                </div>
+                <div class="nvc-item nvc-feel">
+                    <div class="nvc-label"><span class="dot"></span>感受</div>
+                    <div class="nvc-content">${escapeHtml(nvc.feel || '—')}</div>
+                </div>
+                <div class="nvc-item nvc-need">
+                    <div class="nvc-label"><span class="dot"></span>需要</div>
+                    <div class="nvc-content">${escapeHtml(nvc.need || '—')}</div>
+                </div>
+                <div class="nvc-item nvc-request">
+                    <div class="nvc-label"><span class="dot"></span>请求</div>
+                    <div class="nvc-content">${escapeHtml(nvc.request || '—')}</div>
+                </div>
+            </div>
+            <div class="nvc-extras">
+                <div class="intent-box">
+                    <div class="extra-label">💜 真实意图</div>
+                    <div class="extra-content">${escapeHtml(nvc.true_intent || '—')}</div>
+                </div>
+                <div class="improve-box">
+                    <div class="extra-label">✨ 改进建议</div>
+                    <div class="extra-content">${escapeHtml(nvc.improved || '—')}</div>
+                </div>
+            </div>
+        `;
+
+        flow.appendChild(card);
+        scrollFlowToBottom();
+        state.conversationHistory.push({ text: originalText, nvc, time: timeStr });
+    }
+
+    function renderErrorCard(originalText, errorMsg) {
+        const flow = document.getElementById('conversationFlow');
+        const now = new Date();
+        const timeStr = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+
+        // 友好化错误消息
+        let friendlyMsg = errorMsg;
+        let solution = '';
+        if (errorMsg.includes('Failed to fetch') || errorMsg.includes('CORS') || errorMsg.includes('file://')) {
+            solution = '💡 解决方案：双击 <b>start-server.bat</b> 启动本地服务器，然后访问 http://localhost:8080';
+        } else if (errorMsg.includes('API Key') || errorMsg.includes('401') || errorMsg.includes('403')) {
+            solution = '💡 请检查设置中的 API Key 是否正确';
+        } else if (errorMsg.includes('404')) {
+            solution = '💡 请检查 API Base URL 是否正确，通常格式为 https://api.xxx.com/v1';
+        } else if (errorMsg.includes('频率') || errorMsg.includes('429')) {
+            solution = '💡 请等待几秒后重试';
+        }
+
+        const card = document.createElement('div');
+        card.className = 'conv-card';
+        card.innerHTML = `
+            <div class="original-text" style="border-left-color: #ef4444;">
+                <span class="label" style="background: rgba(239,68,68,0.15); color: #f87171;">🗣️ 原话</span>
+                <span class="timestamp">${timeStr}</span>
+                <br>${escapeHtml(originalText)}
+            </div>
+            <div class="intent-box" style="background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.15);">
+                <div class="extra-label" style="color: #f87171;">⚠️ 分析失败</div>
+                <div class="extra-content">${escapeHtml(friendlyMsg)}</div>
+                ${solution ? `<div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(239,68,68,0.15);font-size:0.78rem;color:#fbbf24;">${solution}</div>` : ''}
+            </div>
+        `;
+        flow.appendChild(card);
+        scrollFlowToBottom();
+    }
+
+    // ---------- 设置模块 ----------
+    function toggleSettings() {
+        const overlay = document.getElementById('settingsOverlay');
+        overlay.classList.toggle('open');
+        if (overlay.classList.contains('open')) {
+            loadSettingsToUI();
+            // 防止背景滚动
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+    }
+
+    function selectModel(model) {
+        state.currentModel = model;
+        document.querySelectorAll('.model-option').forEach(opt => {
+            opt.classList.toggle('selected', opt.dataset.model === model);
+        });
+
+        const config = state.config[model];
+        document.getElementById('apiBase').value = config.apiBase || '';
+        document.getElementById('modelName').value = config.modelName || '';
+    }
+
+    function loadSettingsToUI() {
+        const saved = localStorage.getItem('nvc_config');
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                Object.assign(state.config, parsed.config);
+                state.currentModel = parsed.currentModel || 'deepseek';
+                state.customSystemPrompt = parsed.customSystemPrompt || '';
+            } catch(e) {}
+        }
+
+        selectModel(state.currentModel);
+        const config = getCurrentConfig();
+        document.getElementById('apiBase').value = config.apiBase || '';
+        document.getElementById('apiKey').value = config.apiKey || '';
+        document.getElementById('modelName').value = config.modelName || '';
+        document.getElementById('systemPrompt').value = state.customSystemPrompt || '';
+
+        updateModelBadge();
+    }
+
+    function saveSettings() {
+        const model = state.currentModel;
+        state.config[model].apiBase = document.getElementById('apiBase').value.trim();
+        state.config[model].apiKey = document.getElementById('apiKey').value.trim();
+        state.config[model].modelName = document.getElementById('modelName').value.trim();
+        state.customSystemPrompt = document.getElementById('systemPrompt').value.trim();
+
+        localStorage.setItem('nvc_config', JSON.stringify({
+            config: state.config,
+            currentModel: state.currentModel,
+            customSystemPrompt: state.customSystemPrompt
+        }));
+
+        updateModelBadge();
+        toggleSettings();
+        showToast('设置已保存 ✓', 'success');
+    }
+
+    function updateModelBadge() {
+        const badge = document.getElementById('modelBadge');
+        const config = getCurrentConfig();
+        const modelNames = { deepseek: 'DeepSeek', qwen: '通义千问', custom: '自定义' };
+        if (config.apiKey) {
+            badge.textContent = modelNames[state.currentModel] || '自定义';
+            badge.style.background = 'rgba(52,211,153,0.15)';
+            badge.style.color = '#34d399';
+        } else {
+            badge.textContent = '未配置';
+            badge.style.background = 'rgba(239,68,68,0.15)';
+            badge.style.color = '#f87171';
+        }
+    }
+
+    // ---------- 调试面板 ----------
+    let debugVisible = false;
+    const debugLogs = [];
+
+    function debugLog(msg) {
+        const now = new Date();
+        const ts = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`;
+        const line = `[${ts}] ${msg}`;
+        debugLogs.push(line);
+        if (debugLogs.length > 50) debugLogs.shift();
+        console.log('[Debug]', msg);
+        const el = document.getElementById('debugContent');
+        if (el) {
+            el.textContent = debugLogs.join('\n');
+            el.scrollTop = el.scrollHeight;
+        }
+    }
+
+    function toggleDebug() {
+        debugVisible = !debugVisible;
+        let panel = document.getElementById('debugPanel');
+        if (debugVisible) {
+            if (!panel) {
+                panel = document.createElement('div');
+                panel.id = 'debugPanel';
+                panel.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:300;max-height:40vh;background:rgba(0,0,0,0.9);border-top:2px solid #f472b6;overflow:hidden;display:flex;flex-direction:column;';
+                panel.innerHTML = `
+                    <div style="padding:8px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,0.1);">
+                        <span style="color:#f472b6;font-size:0.8rem;font-weight:600;">🔧 调试面板</span>
+                        <div style="display:flex;gap:8px;">
+                            <button onclick="runDiagnostics()" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:white;font-size:0.72rem;cursor:pointer;">运行诊断</button>
+                            <button onclick="toggleDebug()" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:white;font-size:0.72rem;cursor:pointer;">关闭</button>
+                        </div>
+                    </div>
+                    <div id="debugContent" style="flex:1;overflow-y:auto;padding:8px 12px;font-family:monospace;font-size:0.72rem;color:#34d399;line-height:1.6;white-space:pre-wrap;-webkit-overflow-scrolling:touch;"></div>
+                `;
+                document.body.appendChild(panel);
+                debugLog('调试面板已打开');
+                debugLog(`环境: ${isMobile ? 'Mobile' : 'Desktop'} | ${isIOS ? 'iOS' : '非iOS'} | ${isSafari ? 'Safari' : '非Safari'}`);
+                debugLog(`Speech API: ${hasSpeechAPI ? '✅ 可用' : '❌ 不可用'}`);
+                debugLog(`安全上下文: ${isSecureContext ? '✅ 是' : '❌ 否'} (协议: ${location.protocol})`);
+                debugLog(`User-Agent: ${navigator.userAgent.substring(0, 80)}`);
+            }
+            panel.style.display = 'flex';
+        } else if (panel) {
+            panel.style.display = 'none';
+        }
+    }
+
+    async function runDiagnostics() {
+        debugLog('--- 开始诊断 ---');
+
+        // 1. 检查 Speech API
+        debugLog(`1. Speech API: ${hasSpeechAPI ? '✅ 支持' : '❌ 不支持'}`);
+
+        // 2. 检查安全上下文
+        debugLog(`2. 安全上下文: ${isSecureContext ? '✅ 是' : '❌ 否'} (协议: ${location.protocol})`);
+        if (location.protocol === 'file:') {
+            debugLog('   ⚠️ file:// 协议下 fetch 可能被 CORS 阻止，建议使用本地服务器');
+        }
+
+        // 3. 检查麦克风权限
+        try {
+            const result = await navigator.permissions.query({ name: 'microphone' });
+            debugLog(`3. 麦克风权限: ${result.state} (${result.state === 'granted' ? '✅' : result.state === 'denied' ? '❌' : '⚠️'})`);
+        } catch(e) {
+            debugLog(`3. 麦克风权限: 无法查询 (${e.message})`);
+        }
+
+        // 4. 尝试获取麦克风流
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            debugLog(`4. 麦克风设备: ✅ 可用 (tracks: ${stream.getAudioTracks().length})`);
+            debugLog(`   设备: ${stream.getAudioTracks()[0]?.label || '未知'}`);
+            stream.getTracks().forEach(t => t.stop());
+        } catch(e) {
+            debugLog(`4. 麦克风设备: ❌ 不可用 (${e.name}: ${e.message})`);
+        }
+
+        // 5. 检查网络连通性
+        debugLog(`5. 网络状态: ${navigator.onLine ? '✅ 在线' : '❌ 离线'}`);
+
+        // 6. 测试 Speech Recognition
+        if (hasSpeechAPI) {
+            debugLog('6. 尝试启动语音识别测试...');
+            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const testRec = new SR();
+            testRec.continuous = false;
+            testRec.interimResults = false;
+            testRec.lang = 'zh-CN';
+
+            let testTimeout = setTimeout(() => {
+                debugLog('6. ⚠️ 语音识别5秒内无响应（可能被网络阻断）');
+                try { testRec.stop(); } catch(e) {}
+            }, 5000);
+
+            testRec.onstart = () => {
+                debugLog('6. ✅ 语音识别已启动');
+                clearTimeout(testTimeout);
+                testTimeout = setTimeout(() => {
+                    debugLog('6. ℹ️ 测试超时，停止测试');
+                    try { testRec.stop(); } catch(e) {}
+                }, 3000);
+            };
+            testRec.onerror = (e) => {
+                clearTimeout(testTimeout);
+                if (e.error === 'network') {
+                    debugLog(`6. ❌ 网络错误 — 语音识别服务不可达（在中国大陆可能需要科学上网）`);
+                } else if (e.error === 'not-allowed') {
+                    debugLog(`6. ❌ 权限被拒绝`);
+                } else {
+                    debugLog(`6. ❌ 错误: ${e.error}`);
+                }
+            };
+            testRec.onresult = (e) => {
+                debugLog(`6. ✅ 识别成功: "${e.results[0][0].transcript}"`);
+                try { testRec.stop(); } catch(e) {}
+            };
+            testRec.onend = () => {
+                clearTimeout(testTimeout);
+                debugLog('6. 测试结束');
+                // 继续第7步
+                testAPIConnection();
+            };
+
+            try {
+                testRec.start();
+            } catch(e) {
+                debugLog(`6. ❌ 启动失败: ${e.message}`);
+                testAPIConnection();
+            }
+        } else {
+            debugLog('6. 跳过（API 不可用）');
+            testAPIConnection();
+        }
+    }
+
+    async function testAPIConnection() {
+        // 7. 测试 API 连通性
+        const config = getCurrentConfig();
+        if (!config.apiKey) {
+            debugLog('7. API 连通性: ⚠️ 未配置 API Key，跳过测试');
+            debugLog('--- 诊断完成 ---');
+            return;
+        }
+        if (!config.apiBase) {
+            debugLog('7. API 连通性: ⚠️ 未配置 API 地址，跳过测试');
+            debugLog('--- 诊断完成 ---');
+            return;
+        }
+
+        const apiBase = config.apiBase.replace(/\/$/, '');
+        debugLog(`7. 测试 API 连通性: ${apiBase}/models`);
+
+        try {
+            const response = await fetch(`${apiBase}/models`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${config.apiKey}`
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const modelCount = data.data?.length || 0;
+                debugLog(`7. ✅ API 连通正常 (可用模型: ${modelCount})`);
+                // 检查当前模型是否存在
+                if (config.modelName && data.data) {
+                    const found = data.data.some(m => m.id === config.modelName);
+                    debugLog(`   当前模型 "${config.modelName}": ${found ? '✅ 存在' : '❌ 未找到，请检查模型名称'}`);
+                }
+            } else if (response.status === 401 || response.status === 403) {
+                debugLog('7. ❌ API Key 无效或已过期 (401/403)');
+            } else {
+                debugLog(`7. ⚠️ API 返回状态码: ${response.status}`);
+            }
+        } catch(e) {
+            if (e.name === 'TypeError' && e.message === 'Failed to fetch') {
+                if (location.protocol === 'file:') {
+                    debugLog('7. ❌ 网络请求被阻止 — file:// 协议下浏览器不允许跨域请求');
+                    debugLog('   💡 解决方案：双击 start-server.bat 启动本地服务器');
+                } else {
+                    debugLog('7. ❌ 无法连接 API 服务器 — 可能是网络问题或地址不正确');
+                }
+            } else {
+                debugLog(`7. ❌ 连接失败: ${e.message}`);
+            }
+        }
+
+        // 8. 测试实际分析请求
+        debugLog('8. 测试实际 API 调用 (发送简短请求)...');
+        try {
+            const testResponse = await fetch(`${apiBase}/chat/completions`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${config.apiKey}`
+                },
+                body: JSON.stringify({
+                    model: config.modelName,
+                    messages: [
+                        { role: 'user', content: '回复"OK"' }
+                    ],
+                    max_tokens: 10
+                })
+            });
+
+            if (testResponse.ok) {
+                const testData = await testResponse.json();
+                const testContent = testData.choices?.[0]?.message?.content;
+                debugLog(`8. ✅ API 调用成功，返回: "${testContent}"`);
+            } else {
+                const errText = await testResponse.text();
+                debugLog(`8. ❌ API 调用失败 (${testResponse.status}): ${errText.substring(0, 200)}`);
+            }
+        } catch(e) {
+            if (e.name === 'TypeError' && e.message === 'Failed to fetch') {
+                if (location.protocol === 'file:') {
+                    debugLog('8. ❌ CORS 阻止 — 必须通过本地服务器访问');
+                    debugLog('   💡 请双击 start-server.bat，然后在浏览器访问 http://localhost:8080');
+                } else {
+                    debugLog('8. ❌ 请求失败 — 网络不可达');
+                }
+            } else {
+                debugLog(`8. ❌ 测试失败: ${e.message}`);
+            }
+        }
+
+        debugLog('--- 诊断完成 ---');
+    }
+
+    // ---------- 工具函数 ----------
+    function setStatus(type, text) {
+        const dot = document.getElementById('statusDot');
+        const textEl = document.getElementById('statusText');
+        dot.className = 'status-dot' + (type ? ` ${type}` : '');
+        textEl.textContent = text;
+    }
+
+    function showToast(msg, type = '') {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = msg;
+        container.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(-10px)';
+            toast.style.transition = 'all 0.3s';
+            setTimeout(() => toast.remove(), 300);
+        }, 3500);
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function clearHistory() {
+        if (state.conversationHistory.length === 0) return;
+        const flow = document.getElementById('conversationFlow');
+        flow.innerHTML = `
+            <div class="empty-state" id="emptyState">
+                <div class="empty-icon">💬</div>
+                <div class="empty-title">开始你们的对话</div>
+                <div class="empty-desc">
+                    说出或输入你想表达的话，<br>
+                    我会用非暴力沟通的方式，帮你理解话语背后的真实意图，并给出更好的表达建议。
+                </div>
+            </div>
+        `;
+        state.conversationHistory = [];
+        showToast('记录已清空', 'success');
+    }
+
+    // ---------- 视口高度修正（iOS 100vh 问题的 JS 降级方案）----------
+    function setVH() {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+    }
+
+    // ---------- 初始化 ----------
+    document.addEventListener('DOMContentLoaded', () => {
+        loadSettingsToUI();
+        initTextInput();
+
+        // file:// 协议警告
+        if (location.protocol === 'file:') {
+            // 在页面顶部插入醒目提示条
+            const banner = document.createElement('div');
+            banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:999;background:linear-gradient(135deg,#f59e0b,#ef4444);color:white;padding:10px 16px;font-size:0.82rem;text-align:center;line-height:1.5;box-shadow:0 2px 8px rgba(0,0,0,0.3);';
+            banner.innerHTML = '⚠️ 当前通过文件直接打开，API 调用可能被浏览器 CORS 策略阻止。<a href="javascript:void(0)" onclick="this.parentElement.style.display=\'none\';document.getElementById(\'mainApp\').style.paddingTop=\'0\'" style="color:white;text-decoration:underline;margin-left:8px;">知道了</a><br><span style="font-size:0.75rem;opacity:0.9;">💡 解决方案：双击目录下的 <b>start-server.bat</b> 启动本地服务器，访问 http://localhost:8080</span>';
+            document.body.prepend(banner);
+            const mainApp = document.getElementById('mainApp');
+            if (mainApp) mainApp.style.paddingTop = '52px';
+        }
+
+        // 检测语音API可用性，自动切换模式
+        if (!hasSpeechAPI) {
+            switchMode('text');
+            if (isIOS) {
+                showToast('iOS 浏览器不支持语音识别，已启用打字模式', 'error');
+            } else {
+                showToast('当前浏览器不支持语音识别，已启用打字模式', 'error');
+            }
+        } else if (!isSecureContext && !isFileProtocol) {
+            // 非安全上下文，语音识别不可用
+            switchMode('text');
+            showToast('非 HTTPS 环境下语音识别不可用，已启用打字模式', 'error');
+        }
+
+        // 视口修正
+        setVH();
+        window.addEventListener('resize', setVH);
+        // iOS 软键盘弹出/收起时修正
+        if (isIOS) {
+            window.addEventListener('visualViewport', () => {
+                setVH();
+                const flow = document.getElementById('conversationFlow');
+                if (flow) {
+                    requestAnimationFrame(() => {
+                        flow.style.maxHeight = `${window.visualViewport.height - flow.offsetTop}px`;
+                    });
+                }
+            });
+        }
+    });
+
+    // 关闭设置面板 - 点击遮罩
+    document.getElementById('settingsOverlay').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) toggleSettings();
+    });
+
+    // 触摸滑动关闭设置面板
+    (function() {
+        const panel = document.querySelector('.settings-panel');
+        const overlay = document.getElementById('settingsOverlay');
+        let startY = 0;
+        let currentY = 0;
+        let isDragging = false;
+
+        panel.addEventListener('touchstart', (e) => {
+            // 仅在面板顶部开始拖动
+            if (panel.scrollTop <= 0) {
+                startY = e.touches[0].clientY;
+                isDragging = true;
+            }
+        }, { passive: true });
+
+        panel.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            currentY = e.touches[0].clientY;
+            const diff = currentY - startY;
+            if (diff > 0) {
+                // 向下滑动
+                panel.style.transform = `translateY(${diff}px)`;
+                panel.style.transition = 'none';
+            }
+        }, { passive: true });
+
+        panel.addEventListener('touchend', () => {
+            if (!isDragging) return;
+            isDragging = false;
+            const diff = currentY - startY;
+            panel.style.transition = '';
+            panel.style.transform = '';
+            // 下滑超过 100px 则关闭
+            if (diff > 100) {
+                toggleSettings();
+            }
+        });
+    })();
+
+    // ESC 关闭设置
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            const overlay = document.getElementById('settingsOverlay');
+            if (overlay.classList.contains('open')) toggleSettings();
+        }
+    });
+
+    // 防止 iOS 双击缩放
+    document.addEventListener('dblclick', (e) => {
+        e.preventDefault();
+    }, { passive: false });
+    </script>
+</body>
+</html>
