@@ -1245,6 +1245,105 @@
         }
     }
 
+    // ---------- 屏幕常亮模块（Wake Lock API） ----------
+    let wakeLock = null;
+
+    /**
+     * 请求屏幕常亮
+     * 优先使用 Screen Wake Lock API，不支持时用静音视频兜底
+     */
+    async function requestWakeLock() {
+        // 已持有锁 → 跳过
+        if (wakeLock) return;
+
+        try {
+            if ('wakeLock' in navigator) {
+                wakeLock = await navigator.wakeLock.request('screen');
+                console.log('[WakeLock] 屏幕常亮已启用');
+
+                // 锁被系统释放时（如切到后台）自动清理引用
+                wakeLock.addEventListener('release', () => {
+                    console.log('[WakeLock] 锁已被系统释放');
+                    wakeLock = null;
+                });
+            } else {
+                // 不支持 Wake Lock API → 静音视频兜底
+                fallbackWakeLock();
+            }
+        } catch(e) {
+            console.warn('[WakeLock] 请求失败，尝试兜底方案:', e.message);
+            fallbackWakeLock();
+        }
+    }
+
+    /**
+     * 释放屏幕常亮
+     */
+    function releaseWakeLock() {
+        if (wakeLock) {
+            wakeLock.release();
+            wakeLock = null;
+            console.log('[WakeLock] 屏幕常亮已关闭');
+        }
+        stopFallbackWakeLock();
+    }
+
+    /**
+     * 页面可见性恢复时，如果仍在监听则重新获取锁
+     * （切换标签页/切回前台时，Wake Lock 会被浏览器自动释放）
+     */
+    document.addEventListener('visibilitychange', async () => {
+        if (document.visibilityState === 'visible' && state.isListening) {
+            await requestWakeLock();
+        }
+    });
+
+    // ---- 兜底方案：静音视频 ----
+    let fallbackVideo = null;
+
+    function fallbackWakeLock() {
+        if (fallbackVideo) return; // 已在运行
+        try {
+            // 用 Canvas + captureStream 生成动态视频流，比静态 base64 更可靠
+            const canvas = document.createElement('canvas');
+            canvas.width = 2;
+            canvas.height = 2;
+            const ctx = canvas.getContext('2d');
+            const stream = canvas.captureStream(1); // 1fps 足够
+            fallbackVideo = document.createElement('video');
+            fallbackVideo.setAttribute('playsinline', '');
+            fallbackVideo.setAttribute('muted', '');
+            fallbackVideo.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;';
+            fallbackVideo.srcObject = stream;
+            fallbackVideo.muted = true;
+            fallbackVideo.play().catch(() => {});
+            document.body.appendChild(fallbackVideo);
+            // 定时绘制保持流活跃（每2秒画一个像素）
+            canvas._keepAlive = setInterval(() => {
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, 1, 1);
+            }, 2000);
+            console.log('[WakeLock] Canvas视频兜底已启用');
+        } catch(e) {
+            console.warn('[WakeLock] Canvas视频兜底失败:', e.message);
+        }
+    }
+
+    function stopFallbackWakeLock() {
+        if (fallbackVideo) {
+            // 清理定时器
+            if (fallbackVideo.srcObject && fallbackVideo.srcObject.getTracks) {
+                fallbackVideo.srcObject.getTracks().forEach(t => t.stop());
+            }
+            const canvas = document.querySelector('canvas[style*="1px"]');
+            if (canvas && canvas._keepAlive) clearInterval(canvas._keepAlive);
+            fallbackVideo.pause();
+            fallbackVideo.remove();
+            fallbackVideo = null;
+            console.log('[WakeLock] Canvas视频兜底已关闭');
+        }
+    }
+
     // ---------- NVC 默认系统提示词 ----------
     const DEFAULT_NVC_PROMPT = `你是一位精通非暴力沟通（NVC）的情感沟通专家，专门帮助情侣在争吵中理解彼此、化解冲突。
 
@@ -1373,6 +1472,7 @@
             state.isListening = true;
             recognitionRestartCount = 0;
             restartCount = 0;  // 【修复1】每次成功启动也重置局部计数器
+            requestWakeLock();  // 🔒 语音监听时保持屏幕常亮
             updateMicUI();
             setStatus('listening', '正在监听语音...');
             playBeep('start');  // 🔊 开始识别提示音
@@ -1617,6 +1717,8 @@
             btn.classList.remove('recording');
             label.textContent = '点击开始监听';
             desc.textContent = '实时语音识别 · 自动分析';
+            // 🔓 统一释放屏幕常亮：任何导致停止监听的场景都走这里
+            releaseWakeLock();
         }
     }
 
