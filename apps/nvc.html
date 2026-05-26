@@ -2120,6 +2120,7 @@
         flow.appendChild(card);
         scrollFlowToBottom();
         state.conversationHistory.push({ text: originalText, nvc, time: timeStr, speaker });
+        autoSaveDraft();  // 💾 对话变更后自动暂存
     }
 
     function renderErrorCard(originalText, errorMsg, speaker) {
@@ -2159,6 +2160,7 @@
         `;
         flow.appendChild(card);
         scrollFlowToBottom();
+        autoSaveDraft();  // 💾 错误卡片也暂存
     }
 
     // ---------- 设置模块 ----------
@@ -2652,7 +2654,92 @@
         `;
         state.conversationHistory = [];
         state.analysisQueue = [];
+        clearDraft();  // 清空暂存
         showToast('记录已清空', 'success');
+    }
+
+    // ---------- 对话自动暂存模块 ----------
+    const DRAFT_KEY = 'nvc_draft';
+
+    // 自动暂存当前对话（每次对话变更后调用）
+    function autoSaveDraft() {
+        const flow = document.getElementById('conversationFlow');
+        const cards = flow.querySelectorAll('.conv-card');
+        if (cards.length === 0 && state.conversationHistory.length === 0) {
+            try { localStorage.removeItem(DRAFT_KEY); } catch(e) {}
+            return;
+        }
+        try {
+            // 暂存卡片 HTML + 对话数据
+            const cardsHtml = [];
+            cards.forEach(card => cardsHtml.push(card.outerHTML));
+
+            const draft = {
+                conversationHistory: state.conversationHistory,
+                cardsHtml: cardsHtml,
+                savedAt: new Date().toISOString(),
+                rounds: state.conversationHistory.length
+            };
+            localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+            debugLog(`💾 对话已暂存 (${draft.rounds} 轮, ${cardsHtml.length} 张卡片)`);
+        } catch(e) {
+            debugLog(`❌ 暂存失败: ${e.message}`);
+        }
+    }
+
+    // 清除暂存（归档/清空后调用）
+    function clearDraft() {
+        try { localStorage.removeItem(DRAFT_KEY); } catch(e) {}
+    }
+
+    // 恢复暂存对话（页面加载时调用）
+    function restoreDraft() {
+        try {
+            const raw = localStorage.getItem(DRAFT_KEY);
+            if (!raw) return false;
+
+            const draft = JSON.parse(raw);
+            if (!draft.conversationHistory || draft.conversationHistory.length === 0) {
+                clearDraft();
+                return false;
+            }
+
+            // 恢复对话历史数据
+            state.conversationHistory = draft.conversationHistory;
+
+            // 还原卡片 UI
+            const flow = document.getElementById('conversationFlow');
+            flow.innerHTML = ''; // 移除空状态
+
+            if (draft.cardsHtml && draft.cardsHtml.length > 0) {
+                // 优先用缓存的 HTML（保留原始样式）
+                draft.cardsHtml.forEach(html => {
+                    const wrapper = document.createElement('div');
+                    wrapper.innerHTML = html;
+                    const card = wrapper.firstElementChild;
+                    if (card) {
+                        card.style.animation = 'none'; // 移除入场动画
+                        flow.appendChild(card);
+                    }
+                });
+            } else {
+                // 降级：从 conversationHistory 重建卡片
+                draft.conversationHistory.forEach(item => {
+                    renderAnalysisCard(item.text, item.nvc, item.speaker || 'a');
+                });
+            }
+
+            scrollFlowToBottom();
+
+            const savedTime = draft.savedAt ? new Date(draft.savedAt).toLocaleString('zh-CN') : '未知时间';
+            showToast(`📋 已恢复上次对话（${draft.rounds}轮，${savedTime}）`, 'info');
+            debugLog(`📋 暂存已恢复: ${draft.rounds} 轮`);
+            return true;
+        } catch(e) {
+            debugLog(`❌ 暂存恢复失败: ${e.message}`);
+            clearDraft();
+            return false;
+        }
     }
 
     // ---------- 归档 & 历史模块 ----------
@@ -2837,6 +2924,7 @@
         scrollFlowToBottom();
         toggleHistory();
         showToast(`已还原：${archive.name}`, 'success');
+        autoSaveDraft();  // 还原后更新暂存，下次进入也能恢复
         debugLog(`📋 还原归档: ${archive.name} (${archive.rounds} 轮)`);
     }
 
@@ -2882,6 +2970,9 @@
     document.addEventListener('DOMContentLoaded', () => {
         loadSettingsToUI();
         initTextInput();
+
+        // 恢复上次未归档的对话
+        restoreDraft();
 
         // file:// 协议警告
         if (location.protocol === 'file:') {
