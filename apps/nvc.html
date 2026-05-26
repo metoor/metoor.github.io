@@ -23,6 +23,8 @@
             --accent-amber: #fbbf24;
             --accent-green: #34d399;
             --accent-blue: #60a5fa;
+            --accent-orange: #fb923c;
+            --accent-orange-light: #fdba74;
             --text-primary: #f8f0ff;
             --text-secondary: rgba(248, 240, 255, 0.7);
             --text-muted: rgba(248, 240, 255, 0.4);
@@ -315,6 +317,106 @@
             color: white;
         }
 
+        /* ============ 说话人切换 ============ */
+        .speaker-tabs {
+            display: flex; gap: 0; margin-bottom: 8px;
+            border-radius: var(--radius-md);
+            overflow: hidden; position: relative;
+        }
+        .speaker-tab {
+            flex: 1; padding: 7px 12px; border: none;
+            background: rgba(42, 28, 58, 0.5); color: var(--text-muted);
+            font-size: 0.78rem; font-weight: 600; cursor: pointer;
+            transition: all 0.25s; font-family: var(--font-main);
+            touch-action: manipulation; position: relative;
+            display: flex; align-items: center; justify-content: center; gap: 5px;
+        }
+        .speaker-tab:first-child { border-radius: var(--radius-md) 0 0 var(--radius-md); }
+        .speaker-tab:last-child { border-radius: 0 var(--radius-md) var(--radius-md) 0; }
+        .speaker-tab.active-speaker-a {
+            background: linear-gradient(135deg, rgba(244,114,182,0.25), rgba(251,146,60,0.25));
+            color: var(--accent-rose-light);
+            border: 1px solid rgba(244,114,182,0.3);
+        }
+        .speaker-tab.active-speaker-b {
+            background: linear-gradient(135deg, rgba(96,165,250,0.25), rgba(167,139,250,0.25));
+            color: var(--accent-blue);
+            border: 1px solid rgba(96,165,250,0.3);
+        }
+        .speaker-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            display: inline-block; flex-shrink: 0;
+        }
+        .speaker-dot-a { background: var(--accent-rose); }
+        .speaker-dot-b { background: var(--accent-blue); }
+
+        /* ============ 打字模式视觉分组 ============ */
+        /* 打字模式下：speaker-tabs + input-panel 形成一张卡片 */
+        .app-container[data-mode="text"] .speaker-tabs {
+            margin-bottom: 0;
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-bottom: none;
+            padding: 6px 0;
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+        }
+        .app-container[data-mode="text"] .speaker-tab {
+            background: transparent;
+            border-radius: var(--radius-md);
+            margin: 0 4px;
+        }
+        .app-container[data-mode="text"] .speaker-tab.active-speaker-a {
+            background: linear-gradient(135deg, rgba(244,114,182,0.2), rgba(251,146,60,0.2));
+            border: 1px solid rgba(244,114,182,0.25);
+        }
+        .app-container[data-mode="text"] .speaker-tab.active-speaker-b {
+            background: linear-gradient(135deg, rgba(96,165,250,0.2), rgba(167,139,250,0.2));
+            border: 1px solid rgba(96,165,250,0.25);
+        }
+        .app-container[data-mode="text"] .input-panel.visible {
+            margin-bottom: 10px;
+            padding: 10px 12px 12px;
+            border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-top: 1px solid rgba(164,130,255,0.08);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+        }
+
+        /* ============ 双人对话卡片分色 ============ */
+        .conv-card.speaker-a {
+            border-color: rgba(244,114,182,0.2);
+            border-left: 3px solid rgba(244,114,182,0.4);
+        }
+        .conv-card.speaker-a .original-text {
+            border-left-color: var(--accent-rose);
+        }
+        .conv-card.speaker-a .original-text .label {
+            background: rgba(244,114,182,0.15); color: var(--accent-rose-light);
+        }
+        .conv-card.speaker-a .intent-box {
+            background: linear-gradient(135deg, rgba(244,114,182,0.1), rgba(251,146,60,0.1));
+            border-color: rgba(244,114,182,0.15);
+        }
+
+        .conv-card.speaker-b {
+            border-color: rgba(96,165,250,0.2);
+            border-left: 3px solid rgba(96,165,250,0.4);
+        }
+        .conv-card.speaker-b .original-text {
+            border-left-color: var(--accent-blue);
+        }
+        .conv-card.speaker-b .original-text .label {
+            background: rgba(96,165,250,0.15); color: var(--accent-blue);
+        }
+        .conv-card.speaker-b .intent-box {
+            background: linear-gradient(135deg, rgba(96,165,250,0.1), rgba(167,139,250,0.1));
+            border-color: rgba(96,165,250,0.15);
+        }
+
         /* ============ 对话流 ============ */
         .conversation-flow {
             flex: 1; overflow-y: auto; padding-right: 4px;
@@ -528,6 +630,145 @@
         .save-btn:active { transform: scale(0.97); }
         .save-btn:hover { box-shadow: 0 6px 20px rgba(244,114,182,0.3); }
 
+        /* ============ 归档命名弹窗 ============ */
+        .archive-modal-overlay {
+            position: fixed; inset: 0; z-index: 150;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: all 0.3s;
+        }
+        .archive-modal-overlay.open { opacity: 1; pointer-events: auto; }
+        .archive-modal {
+            width: 90%; max-width: 400px;
+            background: var(--bg-secondary); border-radius: var(--radius-xl);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            padding: 24px;
+            transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .archive-modal-overlay.open .archive-modal { transform: scale(1); }
+        .archive-modal h3 {
+            font-size: 1.05rem; font-weight: 700; margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--accent-rose-light), var(--accent-violet-light));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .archive-modal input {
+            width: 100%; padding: 12px 14px; border-radius: var(--radius-md);
+            background: rgba(15,10,26,0.5); border: 1px solid var(--border-color);
+            color: var(--text-primary); font-size: 16px; font-family: var(--font-main);
+            transition: all 0.2s; -webkit-appearance: none;
+        }
+        .archive-modal input:focus {
+            outline: none; border-color: var(--accent-violet);
+            box-shadow: 0 0 0 3px rgba(167,139,250,0.15);
+        }
+        .archive-modal .modal-hint {
+            font-size: 0.72rem; color: var(--text-muted); margin-top: 6px;
+        }
+        .archive-modal .modal-actions {
+            display: flex; gap: 10px; margin-top: 18px;
+        }
+        .archive-modal .modal-actions button {
+            flex: 1; padding: 12px; border-radius: var(--radius-md);
+            border: none; font-size: 0.88rem; font-weight: 600;
+            cursor: pointer; transition: all 0.2s; font-family: var(--font-main);
+            touch-action: manipulation; min-height: 46px;
+        }
+        .modal-btn-cancel {
+            background: var(--bg-card); color: var(--text-secondary);
+            border: 1px solid var(--border-color) !important;
+        }
+        .modal-btn-cancel:active { background: var(--bg-card-hover); transform: scale(0.97); }
+        .modal-btn-confirm {
+            background: linear-gradient(135deg, var(--accent-rose), var(--accent-violet));
+            color: white;
+        }
+        .modal-btn-confirm:active { transform: scale(0.97); }
+        .modal-btn-confirm:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+        /* ============ 历史面板 ============ */
+        .history-overlay {
+            position: fixed; inset: 0; z-index: 120;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex; align-items: flex-end; justify-content: center;
+            opacity: 0; pointer-events: none; transition: all 0.3s;
+        }
+        .history-overlay.open { opacity: 1; pointer-events: auto; }
+        .history-panel {
+            width: 100%; max-width: 520px; max-height: 85dvh;
+            background: var(--bg-secondary); border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            border: 1px solid var(--border-color);
+            border-bottom: none;
+            box-shadow: 0 -10px 60px rgba(0,0,0,0.5);
+            overflow-y: auto; padding: 20px 24px calc(20px + var(--safe-bottom));
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            -webkit-overflow-scrolling: touch;
+        }
+        .history-overlay.open .history-panel { transform: translateY(0); }
+        .history-panel .settings-drag-handle { width: 36px; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.15); margin: 0 auto 16px; }
+        .history-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        .history-header h2 { font-size: 1.1rem; font-weight: 700; }
+        .history-close {
+            min-width: 44px; min-height: 44px; width: 44px; height: 44px;
+            border-radius: 12px; border: none;
+            background: var(--bg-card); color: var(--text-secondary);
+            font-size: 18px; cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center;
+            touch-action: manipulation;
+        }
+        .history-close:active { background: var(--bg-card-hover); color: var(--text-primary); transform: scale(0.94); }
+
+        .history-empty {
+            text-align: center; padding: 40px 20px; color: var(--text-muted);
+        }
+        .history-empty-icon { font-size: 48px; opacity: 0.3; margin-bottom: 12px; }
+        .history-empty p { font-size: 0.85rem; }
+
+        .history-list { display: flex; flex-direction: column; gap: 10px; }
+        .history-item {
+            padding: 14px 16px; border-radius: var(--radius-lg);
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; gap: 12px;
+            touch-action: manipulation;
+        }
+        .history-item:active { background: var(--bg-card-hover); transform: scale(0.98); }
+        .history-item:hover { border-color: rgba(164,130,255,0.3); }
+        .history-item-icon {
+            width: 40px; height: 40px; border-radius: 12px; flex-shrink: 0;
+            background: linear-gradient(135deg, rgba(244,114,182,0.15), rgba(167,139,250,0.15));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+        }
+        .history-item-info { flex: 1; min-width: 0; }
+        .history-item-name {
+            font-size: 0.88rem; font-weight: 600; color: var(--text-primary);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .history-item-meta {
+            font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;
+            display: flex; gap: 8px;
+        }
+        .history-item-delete {
+            min-width: 36px; min-height: 36px; width: 36px; height: 36px;
+            border-radius: 10px; border: none; background: transparent;
+            color: var(--text-muted); font-size: 14px; cursor: pointer;
+            transition: all 0.2s; display: flex; align-items: center;
+            justify-content: center; flex-shrink: 0; touch-action: manipulation;
+        }
+        .history-item-delete:active { background: rgba(239,68,68,0.15); color: #f87171; transform: scale(0.9); }
+
         /* ============ Toast 通知 ============ */
         .toast-container {
             position: fixed; top: calc(16px + var(--safe-top)); left: 16px; right: 16px; z-index: 200;
@@ -591,6 +832,16 @@
                 max-height: 85dvh;
             }
             .settings-drag-handle { display: none; }
+            .history-overlay {
+                align-items: center; justify-content: center;
+            }
+            .history-panel {
+                border-radius: var(--radius-xl);
+                border-bottom: 1px solid var(--border-color);
+                max-height: 85dvh;
+                transform: translateY(20px) scale(0.97);
+            }
+            .history-overlay.open .history-panel { transform: translateY(0) scale(1); }
         }
 
         /* ============ 响应式 - 手机竖屏 ============ */
@@ -605,6 +856,7 @@
             .voice-panel { padding: 12px; gap: 12px; }
             .mic-btn { width: 56px; height: 56px; font-size: 22px; }
             .status-bar { padding: 8px 12px; margin-bottom: 6px; font-size: 0.78rem; gap: 8px; }
+            .speaker-tab { padding: 6px 8px; font-size: 0.72rem; }
             .conv-card { padding: 14px; }
             .conv-card .original-text { padding: 10px 12px; font-size: 0.88rem; }
             .nvc-analysis { grid-template-columns: 1fr 1fr; gap: 6px; }
@@ -661,6 +913,31 @@
     <!-- Toast 通知容器 -->
     <div class="toast-container" id="toastContainer"></div>
 
+    <!-- 归档命名弹窗 -->
+    <div class="archive-modal-overlay" id="archiveModalOverlay">
+        <div class="archive-modal">
+            <h3>📦 归档对话</h3>
+            <input type="text" id="archiveNameInput" placeholder="给这次对话取个名字..." maxlength="30">
+            <div class="modal-hint">留空将自动使用时间命名</div>
+            <div class="modal-actions">
+                <button class="modal-btn-cancel" onclick="closeArchiveModal()">取消</button>
+                <button class="modal-btn-confirm" id="archiveConfirmBtn" onclick="confirmArchive()">确认归档</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 历史面板 -->
+    <div class="history-overlay" id="historyOverlay">
+        <div class="history-panel">
+            <div class="settings-drag-handle"></div>
+            <div class="history-header">
+                <h2>📋 历史归档</h2>
+                <button class="history-close" onclick="toggleHistory()">✕</button>
+            </div>
+            <div id="historyContent"></div>
+        </div>
+    </div>
+
     <!-- 设置面板 -->
     <div class="settings-overlay" id="settingsOverlay">
         <div class="settings-panel">
@@ -682,28 +959,45 @@
                 </div>
                 <div class="model-option" data-model="custom" onclick="selectModel('custom')">
                     <div class="model-name">自定义</div>
-                    <div class="model-desc">OpenAI 兼容</div>
+                    <div class="model-desc">OpenAI / Anthropic</div>
                 </div>
+            </div>
+
+            <!-- API 类型切换（仅自定义模型时显示） -->
+            <div class="setting-group" id="apiTypeGroup" style="display:none;">
+                <label>API 协议类型</label>
+                <div style="display:flex;gap:0;border-radius:var(--radius-md);overflow:hidden;">
+                    <button type="button" class="api-type-btn active" id="btnTypeOpenAI" onclick="switchApiType('openai')" style="flex:1;padding:8px;border:1px solid rgba(96,165,250,0.3);background:rgba(96,165,250,0.15);color:#60a5fa;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:var(--font-main);transition:all 0.2s;">
+                        🟢 OpenAI 兼容
+                    </button>
+                    <button type="button" class="api-type-btn" id="btnTypeAnthropic" onclick="switchApiType('anthropic')" style="flex:1;padding:8px;border:1px solid rgba(167,139,250,0.15);background:rgba(42,28,58,0.5);color:var(--text-muted);font-size:0.8rem;font-weight:600;cursor:pointer;font-family:var(--font-main);transition:all 0.2s;">
+                        🟣 Anthropic
+                    </button>
+                </div>
+                <div class="hint" id="apiTypeHint">OpenAI 兼容格式：DeepSeek、千问、Moonshot、GLM 等</div>
             </div>
 
             <div class="setting-group">
                 <label>API Base URL</label>
-                <input type="url" id="apiBase" placeholder="https://api.deepseek.com/v1" autocomplete="off">
+                <input type="url" id="apiBase" placeholder="https://api.deepseek.com/v1" autocomplete="off" oninput="autoSaveSettings()">
                 <div class="hint">DeepSeek: https://api.deepseek.com/v1 | 千问: https://dashscope.aliyuncs.com/compatible-mode/v1</div>
             </div>
             <div class="setting-group">
                 <label>API Key</label>
-                <input type="password" id="apiKey" placeholder="sk-xxxxxxxxxxxxxxxx" autocomplete="off">
-                <div class="hint">密钥仅在本地使用，不会上传到任何服务器</div>
+                <div style="position:relative;">
+                    <input type="password" id="apiKey" placeholder="sk-xxxxxxxxxxxxxxxx" autocomplete="off" oninput="autoSaveSettings()" style="padding-right:40px;">
+                    <button onclick="toggleKeyVisibility()" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;padding:4px;" title="显示/隐藏密钥">👁️</button>
+                </div>
+                <div class="hint">密钥仅在本地使用，不会上传到任何服务器 · 输入自动保存</div>
             </div>
             <div class="setting-group">
                 <label>模型名称</label>
-                <input type="text" id="modelName" placeholder="deepseek-chat" autocomplete="off">
+                <input type="text" id="modelName" placeholder="deepseek-chat" autocomplete="off" oninput="autoSaveSettings()">
                 <div class="hint">DeepSeek: deepseek-chat | 千问: qwen-plus</div>
             </div>
             <div class="setting-group">
                 <label>系统提示词（可选自定义）</label>
-                <textarea id="systemPrompt" placeholder="留空使用默认非暴力沟通提示词..."></textarea>
+                <textarea id="systemPrompt" placeholder="留空使用默认非暴力沟通提示词..." oninput="autoSaveSettings()"></textarea>
             </div>
 
             <button class="save-btn" onclick="saveSettings()">💾 保存设置</button>
@@ -711,7 +1005,7 @@
     </div>
 
     <!-- 主容器 -->
-    <div class="app-container">
+    <div class="app-container" data-mode="voice">
         <!-- 顶部栏 -->
         <div class="top-bar">
             <div class="logo">
@@ -722,6 +1016,8 @@
                 </div>
             </div>
             <div class="top-actions">
+                <button class="icon-btn" onclick="openArchiveModal()" title="归档">📦</button>
+                <button class="icon-btn" onclick="toggleHistory()" title="历史">📋</button>
                 <button class="icon-btn" onclick="toggleDebug()" title="调试">🔧</button>
                 <button class="icon-btn" onclick="clearHistory()" title="清空记录">🗑️</button>
                 <button class="icon-btn" onclick="toggleSettings()" title="设置">⚙️</button>
@@ -739,6 +1035,16 @@
         <div class="mode-tabs" id="modeTabs">
             <button class="mode-tab active" data-mode="voice" onclick="switchMode('voice')">🎤 语音</button>
             <button class="mode-tab" data-mode="text" onclick="switchMode('text')">✏️ 打字</button>
+        </div>
+
+        <!-- 说话人切换 -->
+        <div class="speaker-tabs" id="speakerTabs">
+            <button class="speaker-tab active-speaker-a" data-speaker="a" onclick="switchSpeaker('a')">
+                <span class="speaker-dot speaker-dot-a"></span>我
+            </button>
+            <button class="speaker-tab" data-speaker="b" onclick="switchSpeaker('b')">
+                <span class="speaker-dot speaker-dot-b"></span>对方
+            </button>
         </div>
 
         <!-- 语音控制面板 -->
@@ -801,6 +1107,7 @@
         isAnalyzing: false,
         recognition: null,
         currentModel: 'deepseek',
+        currentSpeaker: 'a',  // 'a' = 我, 'b' = 对方
         inputMode: hasSpeechAPI ? 'voice' : 'text',  // 无语音API时默认文本模式
         config: {
             deepseek: {
@@ -816,7 +1123,8 @@
             custom: {
                 apiBase: '',
                 apiKey: '',
-                modelName: ''
+                modelName: '',
+                apiType: 'openai'  // 'openai' | 'anthropic'
             }
         },
         customSystemPrompt: '',
@@ -827,7 +1135,9 @@
     // ---------- NVC 默认系统提示词 ----------
     const DEFAULT_NVC_PROMPT = `你是一位精通非暴力沟通（NVC）的情感沟通专家，专门帮助情侣在争吵中理解彼此、化解冲突。
 
-你的任务：分析用户说出的每一句话，用非暴力沟通的四要素框架进行拆解，并给出建设性的改进建议。
+你的任务：分析对话中某一方说出的每一句话，用非暴力沟通的四要素框架进行拆解，并给出建设性的改进建议。
+
+重要：你将收到"说话人"身份标记（A方或B方）以及之前的对话上下文。请结合上下文进行分析——理解这句话是在回应什么、说话人的情绪背景是什么。
 
 请严格按照以下 JSON 格式输出（不要输出任何其他内容）：
 {
@@ -852,6 +1162,8 @@
     // ---------- 输入模式切换 ----------
     function switchMode(mode) {
         state.inputMode = mode;
+        // 同步 data-mode 到 app-container，用于 CSS 视觉分组
+        document.querySelector('.app-container').dataset.mode = mode;
         document.querySelectorAll('.mode-tab').forEach(tab => {
             tab.classList.toggle('active', tab.dataset.mode === mode);
         });
@@ -878,6 +1190,32 @@
                 document.getElementById('textInput').focus();
             }, 100);
         }
+    }
+
+    // ---------- 说话人切换 ----------
+    function switchSpeaker(speaker) {
+        state.currentSpeaker = speaker;
+        document.querySelectorAll('.speaker-tab').forEach(tab => {
+            tab.classList.remove('active-speaker-a', 'active-speaker-b');
+            if (tab.dataset.speaker === speaker) {
+                tab.classList.add(speaker === 'a' ? 'active-speaker-a' : 'active-speaker-b');
+            }
+        });
+        // 更新文本输入框的提示文字
+        const textInput = document.getElementById('textInput');
+        if (textInput) {
+            textInput.placeholder = speaker === 'a' ? '输入你想说的话...' : '输入对方说的话...';
+        }
+    }
+
+    // 自动切换说话人（分析完成后调用）
+    function autoSwitchSpeaker() {
+        const nextSpeaker = state.currentSpeaker === 'a' ? 'b' : 'a';
+        switchSpeaker(nextSpeaker);
+    }
+
+    function getSpeakerLabel(speaker) {
+        return speaker === 'a' ? '🟠 我' : '🔵 对方';
     }
 
     // ---------- 语音识别模块 ----------
@@ -1197,7 +1535,7 @@
         return state.config[state.currentModel];
     }
 
-    async function callLLM(userText) {
+    async function callLLM(userText, speaker) {
         const config = getCurrentConfig();
         if (!config.apiKey) {
             throw new Error('未配置 API Key，请在设置中填写');
@@ -1209,40 +1547,83 @@
 
         const systemPrompt = state.customSystemPrompt || DEFAULT_NVC_PROMPT;
         const apiBase = config.apiBase.replace(/\/$/, '');
+        const apiType = config.apiType || 'openai';
+
+        // 构建对话上下文
+        const messages = [
+            { role: 'system', content: systemPrompt }
+        ];
+
+        // 加入最近几轮对话作为上下文（最多5轮）
+        const recentHistory = state.conversationHistory.slice(-5);
+        if (recentHistory.length > 0) {
+            let contextIntro = '以下是之前的对话记录（供参考）：\n';
+            recentHistory.forEach((item, idx) => {
+                const speakerLabel = item.speaker === 'a' ? 'A方' : 'B方';
+                contextIntro += `${speakerLabel}：「${item.text}」\n`;
+            });
+            messages.push({ role: 'assistant', content: contextIntro + '\n（以上为历史对话，现在请分析新的发言）' });
+        }
+
+        // 当前发言
+        const speakerLabel = speaker === 'a' ? 'A方（"我"）' : 'B方（"对方"）';
+        messages.push({
+            role: 'user',
+            content: `当前说话人：${speakerLabel}\n请分析这句话："${userText}"${recentHistory.length > 0 ? '\n\n（请结合上面的对话上下文来理解这句话的背景和情绪）' : ''}`
+        });
 
         // 检测 file:// 协议下的 CORS 问题
         if (location.protocol === 'file:') {
             debugLog(`⚠️ 当前为 file:// 协议，可能存在 CORS 限制`);
-            debugLog(`正在尝试请求: ${apiBase}/chat/completions`);
         }
 
-        const requestBody = {
-            model: config.modelName,
-            messages: [
-                { role: 'system', content: systemPrompt },
-                { role: 'user', content: `请分析这句话："${userText}"` }
-            ],
-            temperature: 0.7,
-            max_tokens: 800
-        };
-
-        // 只有 deepseek-chat 明确支持 json_object，其他模型可能不支持
-        // 改为通过 prompt 约束输出格式，而非 response_format 参数
-        debugLog(`API 请求: ${apiBase}/chat/completions | model: ${config.modelName}`);
+        debugLog(`API 类型: ${apiType} | 请求: ${apiBase} | model: ${config.modelName}`);
 
         let response;
         try {
-            response = await fetch(`${apiBase}/chat/completions`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${config.apiKey}`
-                },
-                body: JSON.stringify(requestBody)
-            });
+            if (apiType === 'anthropic') {
+                // ============ Anthropic Messages API ============
+                const anthropicMessages = messages.filter(m => m.role !== 'system');
+                const requestBody = {
+                    model: config.modelName || 'claude-sonnet-4-20250514',
+                    max_tokens: 800,
+                    system: systemPrompt,
+                    messages: anthropicMessages,
+                    temperature: 0.7
+                };
+                debugLog(`Anthropic 请求: ${apiBase}/v1/messages`);
+
+                response = await fetch(`${apiBase}/v1/messages`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': config.apiKey,
+                        'anthropic-version': '2023-06-01',
+                        'anthropic-dangerous-direct-browser-access': 'true'
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+            } else {
+                // ============ OpenAI Compatible API ============
+                const requestBody = {
+                    model: config.modelName,
+                    messages: messages,
+                    temperature: 0.7,
+                    max_tokens: 800
+                };
+                debugLog(`OpenAI 请求: ${apiBase}/chat/completions`);
+
+                response = await fetch(`${apiBase}/chat/completions`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${config.apiKey}`
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+            }
         } catch (fetchError) {
             debugLog(`❌ fetch 失败: ${fetchError.message}`);
-            // 网络错误分类
             if (fetchError.name === 'TypeError' && fetchError.message === 'Failed to fetch') {
                 if (location.protocol === 'file:') {
                     throw new Error('网络请求失败：当前通过文件直接打开（file://），浏览器会阻止跨域请求。\n\n💡 解决方案：\n1. 使用下方的"启动本地服务器"按钮\n2. 或通过 VS Code Live Server 打开\n3. 或部署到 HTTPS 服务器');
@@ -1263,7 +1644,6 @@
                 errorDetail = '(无法读取错误详情)';
             }
 
-            // 友好化常见错误
             if (response.status === 401 || response.status === 403) {
                 throw new Error('API Key 无效或已过期，请检查设置中的 API Key');
             }
@@ -1274,7 +1654,6 @@
                 throw new Error('API 请求频率超限，请稍后再试');
             }
             if (response.status === 400) {
-                // 可能是模型名称错误或参数不支持
                 try {
                     const errJson = JSON.parse(errorDetail);
                     const errMsg = errJson.error?.message || errJson.message || errorDetail.substring(0, 200);
@@ -1298,7 +1677,16 @@
             throw new Error('API 返回的不是有效的 JSON 格式');
         }
 
-        const content = data.choices?.[0]?.message?.content;
+        // 解析内容 — 兼容 OpenAI 和 Anthropic 两种响应格式
+        let content;
+        if (apiType === 'anthropic') {
+            // Anthropic 响应: { content: [{ type: "text", text: "..." }] }
+            content = data.content?.[0]?.text;
+        } else {
+            // OpenAI 响应: { choices: [{ message: { content: "..." } }] }
+            content = data.choices?.[0]?.message?.content;
+        }
+
         debugLog(`模型输出: ${content ? content.substring(0, 100) + '...' : '(空)'}`);
 
         if (!content) {
@@ -1310,7 +1698,6 @@
         try {
             return JSON.parse(content);
         } catch {
-            // 尝试从文本中提取 JSON
             const jsonMatch = content.match(/\{[\s\S]*\}/);
             if (jsonMatch) {
                 try {
@@ -1328,7 +1715,8 @@
     async function analyzeText(text) {
         if (state.isAnalyzing) return;
         state.isAnalyzing = true;
-        setStatus('analyzing', '正在分析...');
+        const speaker = state.currentSpeaker; // 锁定当前说话人
+        setStatus('analyzing', `正在分析${speaker === 'a' ? '我' : '对方'}的话...`);
 
         const emptyState = document.getElementById('emptyState');
         if (emptyState) emptyState.remove();
@@ -1337,20 +1725,23 @@
         const indicator = document.createElement('div');
         indicator.className = 'analyzing-indicator';
         indicator.id = 'analyzingIndicator';
-        indicator.innerHTML = `🔍 正在分析：${text.substring(0, 24)}${text.length > 24 ? '...' : ''} <span class="dots"><span></span><span></span><span></span></span>`;
+        const speakerTag = speaker === 'a' ? '🟠' : '🔵';
+        indicator.innerHTML = `🔍 ${speakerTag} 正在分析：${text.substring(0, 24)}${text.length > 24 ? '...' : ''} <span class="dots"><span></span><span></span><span></span></span>`;
         flow.appendChild(indicator);
         scrollFlowToBottom();
 
         try {
-            const result = await callLLM(text);
+            const result = await callLLM(text, speaker);
             indicator.remove();
-            renderAnalysisCard(text, result);
+            renderAnalysisCard(text, result, speaker);
+            // 分析完成后自动切换到对方
+            autoSwitchSpeaker();
             setStatus(state.isListening ? 'listening' : '准备就绪', state.isListening ? '正在监听语音...' : '准备就绪');
         } catch (error) {
             indicator.remove();
             console.error('分析失败:', error);
             showToast(`分析失败：${error.message}`, 'error');
-            renderErrorCard(text, error.message);
+            renderErrorCard(text, error.message, speaker);
             setStatus(state.isListening ? 'listening' : '', state.isListening ? '正在监听语音...' : '分析失败');
         } finally {
             state.isAnalyzing = false;
@@ -1365,16 +1756,19 @@
         });
     }
 
-    function renderAnalysisCard(originalText, nvc) {
+    function renderAnalysisCard(originalText, nvc, speaker) {
         const flow = document.getElementById('conversationFlow');
         const now = new Date();
         const timeStr = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+        const speakerClass = speaker === 'a' ? 'speaker-a' : 'speaker-b';
+        const speakerIcon = speaker === 'a' ? '🟠' : '🔵';
+        const speakerName = speaker === 'a' ? '我' : '对方';
 
         const card = document.createElement('div');
-        card.className = 'conv-card';
+        card.className = `conv-card ${speakerClass}`;
         card.innerHTML = `
             <div class="original-text">
-                <span class="label">🗣️ 原话</span>
+                <span class="label">${speakerIcon} ${speakerName}</span>
                 <span class="timestamp">${timeStr}</span>
                 <br>${escapeHtml(originalText)}
             </div>
@@ -1410,13 +1804,16 @@
 
         flow.appendChild(card);
         scrollFlowToBottom();
-        state.conversationHistory.push({ text: originalText, nvc, time: timeStr });
+        state.conversationHistory.push({ text: originalText, nvc, time: timeStr, speaker });
     }
 
-    function renderErrorCard(originalText, errorMsg) {
+    function renderErrorCard(originalText, errorMsg, speaker) {
         const flow = document.getElementById('conversationFlow');
         const now = new Date();
         const timeStr = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+        const speakerClass = (speaker || 'a') === 'a' ? 'speaker-a' : 'speaker-b';
+        const speakerIcon = (speaker || 'a') === 'a' ? '🟠' : '🔵';
+        const speakerName = (speaker || 'a') === 'a' ? '我' : '对方';
 
         // 友好化错误消息
         let friendlyMsg = errorMsg;
@@ -1432,10 +1829,10 @@
         }
 
         const card = document.createElement('div');
-        card.className = 'conv-card';
+        card.className = `conv-card ${speakerClass}`;
         card.innerHTML = `
             <div class="original-text" style="border-left-color: #ef4444;">
-                <span class="label" style="background: rgba(239,68,68,0.15); color: #f87171;">🗣️ 原话</span>
+                <span class="label" style="background: rgba(239,68,68,0.15); color: #f87171;">${speakerIcon} ${speakerName}</span>
                 <span class="timestamp">${timeStr}</span>
                 <br>${escapeHtml(originalText)}
             </div>
@@ -1470,18 +1867,94 @@
 
         const config = state.config[model];
         document.getElementById('apiBase').value = config.apiBase || '';
+        document.getElementById('apiKey').value = config.apiKey || '';
         document.getElementById('modelName').value = config.modelName || '';
+
+        // 显示/隐藏 API 类型切换（仅自定义模型）
+        const apiTypeGroup = document.getElementById('apiTypeGroup');
+        if (model === 'custom') {
+            apiTypeGroup.style.display = '';
+            const apiType = config.apiType || 'openai';
+            updateApiTypeUI(apiType);
+        } else {
+            apiTypeGroup.style.display = 'none';
+        }
+
+        // 更新 placeholder 提示
+        updatePlaceholderHints(model);
+    }
+
+    function switchApiType(type) {
+        state.config.custom.apiType = type;
+        updateApiTypeUI(type);
+        autoSaveSettings();
+    }
+
+    function updateApiTypeUI(type) {
+        const btnOpenAI = document.getElementById('btnTypeOpenAI');
+        const btnAnthropic = document.getElementById('btnTypeAnthropic');
+        const hint = document.getElementById('apiTypeHint');
+
+        if (type === 'openai') {
+            btnOpenAI.style.background = 'rgba(96,165,250,0.15)';
+            btnOpenAI.style.color = '#60a5fa';
+            btnOpenAI.style.borderColor = 'rgba(96,165,250,0.3)';
+            btnAnthropic.style.background = 'rgba(42,28,58,0.5)';
+            btnAnthropic.style.color = 'var(--text-muted)';
+            btnAnthropic.style.borderColor = 'rgba(167,139,250,0.15)';
+            hint.textContent = 'OpenAI 兼容格式：DeepSeek、千问、Moonshot、GLM 等';
+        } else {
+            btnAnthropic.style.background = 'rgba(167,139,250,0.15)';
+            btnAnthropic.style.color = '#a78bfa';
+            btnAnthropic.style.borderColor = 'rgba(167,139,250,0.3)';
+            btnOpenAI.style.background = 'rgba(42,28,58,0.5)';
+            btnOpenAI.style.color = 'var(--text-muted)';
+            btnOpenAI.style.borderColor = 'rgba(96,165,250,0.15)';
+            hint.textContent = 'Anthropic 格式：Claude 3.5 Sonnet、Claude 3 Opus 等';
+        }
+    }
+
+    function updatePlaceholderHints(model) {
+        const apiBaseInput = document.getElementById('apiBase');
+        const modelNameInput = document.getElementById('modelName');
+        const apiKeyInput = document.getElementById('apiKey');
+
+        if (model === 'deepseek') {
+            apiBaseInput.placeholder = 'https://api.deepseek.com/v1';
+            modelNameInput.placeholder = 'deepseek-chat';
+            apiKeyInput.placeholder = 'sk-xxxxxxxxxxxxxxxx';
+        } else if (model === 'qwen') {
+            apiBaseInput.placeholder = 'https://dashscope.aliyuncs.com/compatible-mode/v1';
+            modelNameInput.placeholder = 'qwen-plus';
+            apiKeyInput.placeholder = 'sk-xxxxxxxxxxxxxxxx';
+        } else {
+            const apiType = state.config.custom.apiType || 'openai';
+            if (apiType === 'anthropic') {
+                apiBaseInput.placeholder = 'https://api.anthropic.com';
+                modelNameInput.placeholder = 'claude-sonnet-4-20250514';
+                apiKeyInput.placeholder = 'sk-ant-xxxxxxxxxxxxxxxx';
+            } else {
+                apiBaseInput.placeholder = 'https://api.example.com/v1';
+                modelNameInput.placeholder = 'model-name';
+                apiKeyInput.placeholder = 'sk-xxxxxxxxxxxxxxxx';
+            }
+        }
     }
 
     function loadSettingsToUI() {
-        const saved = localStorage.getItem('nvc_config');
-        if (saved) {
-            try {
+        let loaded = false;
+        try {
+            const saved = localStorage.getItem('nvc_config');
+            if (saved) {
                 const parsed = JSON.parse(saved);
-                Object.assign(state.config, parsed.config);
-                state.currentModel = parsed.currentModel || 'deepseek';
-                state.customSystemPrompt = parsed.customSystemPrompt || '';
-            } catch(e) {}
+                if (parsed.config) Object.assign(state.config, parsed.config);
+                if (parsed.currentModel) state.currentModel = parsed.currentModel;
+                if (parsed.customSystemPrompt !== undefined) state.customSystemPrompt = parsed.customSystemPrompt;
+                loaded = true;
+                debugLog('⚙️ 已从本地缓存加载设置');
+            }
+        } catch(e) {
+            debugLog(`❌ 读取设置失败: ${e.message}`);
         }
 
         selectModel(state.currentModel);
@@ -1492,6 +1965,36 @@
         document.getElementById('systemPrompt').value = state.customSystemPrompt || '';
 
         updateModelBadge();
+
+        if (loaded && config.apiKey) {
+            debugLog(`✅ 当前模型: ${state.currentModel} | Key: ${config.apiKey.substring(0, 6)}...`);
+        }
+    }
+
+    let autoSaveTimer = null;
+
+    function autoSaveSettings() {
+        // 防抖：停止输入 500ms 后自动保存
+        clearTimeout(autoSaveTimer);
+        autoSaveTimer = setTimeout(() => {
+            const model = state.currentModel;
+            state.config[model].apiBase = document.getElementById('apiBase').value.trim();
+            state.config[model].apiKey = document.getElementById('apiKey').value.trim();
+            state.config[model].modelName = document.getElementById('modelName').value.trim();
+
+            try {
+                localStorage.setItem('nvc_config', JSON.stringify({
+                    config: state.config,
+                    currentModel: state.currentModel,
+                    customSystemPrompt: state.customSystemPrompt || ''
+                }));
+                debugLog(`⚙️ 设置已自动保存 (${model})`);
+            } catch(e) {
+                debugLog(`❌ 自动保存失败: ${e.message}`);
+            }
+
+            updateModelBadge();
+        }, 500);
     }
 
     function saveSettings() {
@@ -1501,15 +2004,25 @@
         state.config[model].modelName = document.getElementById('modelName').value.trim();
         state.customSystemPrompt = document.getElementById('systemPrompt').value.trim();
 
-        localStorage.setItem('nvc_config', JSON.stringify({
-            config: state.config,
-            currentModel: state.currentModel,
-            customSystemPrompt: state.customSystemPrompt
-        }));
+        try {
+            localStorage.setItem('nvc_config', JSON.stringify({
+                config: state.config,
+                currentModel: state.currentModel,
+                customSystemPrompt: state.customSystemPrompt
+            }));
+        } catch(e) {
+            showToast('保存失败：本地存储不可用', 'error');
+            return;
+        }
 
         updateModelBadge();
         toggleSettings();
         showToast('设置已保存 ✓', 'success');
+    }
+
+    function toggleKeyVisibility() {
+        const input = document.getElementById('apiKey');
+        input.type = input.type === 'password' ? 'text' : 'password';
     }
 
     function updateModelBadge() {
@@ -1517,7 +2030,12 @@
         const config = getCurrentConfig();
         const modelNames = { deepseek: 'DeepSeek', qwen: '通义千问', custom: '自定义' };
         if (config.apiKey) {
-            badge.textContent = modelNames[state.currentModel] || '自定义';
+            let label = modelNames[state.currentModel] || '自定义';
+            if (state.currentModel === 'custom') {
+                const apiType = config.apiType || 'openai';
+                label += apiType === 'anthropic' ? ' · Anthropic' : ' · OpenAI';
+            }
+            badge.textContent = label;
             badge.style.background = 'rgba(52,211,153,0.15)';
             badge.style.color = '#34d399';
         } else {
@@ -1679,40 +2197,45 @@
         }
 
         const apiBase = config.apiBase.replace(/\/$/, '');
-        debugLog(`7. 测试 API 连通性: ${apiBase}/models`);
+        const apiType = config.apiType || 'openai';
 
-        try {
-            const response = await fetch(`${apiBase}/models`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${config.apiKey}`
-                }
-            });
+        if (apiType === 'anthropic') {
+            // Anthropic 没有 /models 端点，直接测试 /messages
+            debugLog(`7. Anthropic API — 测试消息端点: ${apiBase}/v1/messages`);
+        } else {
+            debugLog(`7. OpenAI API — 测试模型端点: ${apiBase}/models`);
+            try {
+                const response = await fetch(`${apiBase}/models`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${config.apiKey}`
+                    }
+                });
 
-            if (response.ok) {
-                const data = await response.json();
-                const modelCount = data.data?.length || 0;
-                debugLog(`7. ✅ API 连通正常 (可用模型: ${modelCount})`);
-                // 检查当前模型是否存在
-                if (config.modelName && data.data) {
-                    const found = data.data.some(m => m.id === config.modelName);
-                    debugLog(`   当前模型 "${config.modelName}": ${found ? '✅ 存在' : '❌ 未找到，请检查模型名称'}`);
-                }
-            } else if (response.status === 401 || response.status === 403) {
-                debugLog('7. ❌ API Key 无效或已过期 (401/403)');
-            } else {
-                debugLog(`7. ⚠️ API 返回状态码: ${response.status}`);
-            }
-        } catch(e) {
-            if (e.name === 'TypeError' && e.message === 'Failed to fetch') {
-                if (location.protocol === 'file:') {
-                    debugLog('7. ❌ 网络请求被阻止 — file:// 协议下浏览器不允许跨域请求');
-                    debugLog('   💡 解决方案：双击 start-server.bat 启动本地服务器');
+                if (response.ok) {
+                    const data = await response.json();
+                    const modelCount = data.data?.length || 0;
+                    debugLog(`7. ✅ API 连通正常 (可用模型: ${modelCount})`);
+                    if (config.modelName && data.data) {
+                        const found = data.data.some(m => m.id === config.modelName);
+                        debugLog(`   当前模型 "${config.modelName}": ${found ? '✅ 存在' : '❌ 未找到，请检查模型名称'}`);
+                    }
+                } else if (response.status === 401 || response.status === 403) {
+                    debugLog('7. ❌ API Key 无效或已过期 (401/403)');
                 } else {
-                    debugLog('7. ❌ 无法连接 API 服务器 — 可能是网络问题或地址不正确');
+                    debugLog(`7. ⚠️ API 返回状态码: ${response.status}`);
                 }
-            } else {
-                debugLog(`7. ❌ 连接失败: ${e.message}`);
+            } catch(e) {
+                if (e.name === 'TypeError' && e.message === 'Failed to fetch') {
+                    if (location.protocol === 'file:') {
+                        debugLog('7. ❌ 网络请求被阻止 — file:// 协议下浏览器不允许跨域请求');
+                        debugLog('   💡 解决方案：双击 start-server.bat 启动本地服务器');
+                    } else {
+                        debugLog('7. ❌ 无法连接 API 服务器 — 可能是网络问题或地址不正确');
+                    }
+                } else {
+                    debugLog(`7. ❌ 连接失败: ${e.message}`);
+                }
             }
         }
 
@@ -1802,6 +2325,223 @@
         state.conversationHistory = [];
         showToast('记录已清空', 'success');
     }
+
+    // ---------- 归档 & 历史模块 ----------
+    const ARCHIVE_KEY = 'nvc_archives';
+
+    function getArchives() {
+        try {
+            const raw = localStorage.getItem(ARCHIVE_KEY);
+            return raw ? JSON.parse(raw) : [];
+        } catch(e) {
+            debugLog(`❌ 读取归档失败: ${e.message}`);
+            return [];
+        }
+    }
+
+    function saveArchives(archives) {
+        try {
+            localStorage.setItem(ARCHIVE_KEY, JSON.stringify(archives));
+        } catch(e) {
+            debugLog(`❌ 保存归档失败: ${e.message}`);
+            showToast('归档保存失败，可能存储空间不足', 'error');
+        }
+    }
+
+    function generateDefaultArchiveName() {
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = String(now.getMonth() + 1).padStart(2, '0');
+        const d = String(now.getDate()).padStart(2, '0');
+        const h = String(now.getHours()).padStart(2, '0');
+        const min = String(now.getMinutes()).padStart(2, '0');
+        return `${y}-${m}-${d} ${h}:${min} 对话`;
+    }
+
+    function openArchiveModal() {
+        if (state.conversationHistory.length === 0) {
+            showToast('当前没有对话可以归档', 'error');
+            return;
+        }
+        const overlay = document.getElementById('archiveModalOverlay');
+        const input = document.getElementById('archiveNameInput');
+        input.value = generateDefaultArchiveName();
+        overlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => {
+            input.focus();
+            input.select();
+        }, 300);
+    }
+
+    function closeArchiveModal() {
+        const overlay = document.getElementById('archiveModalOverlay');
+        overlay.classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    function confirmArchive() {
+        const input = document.getElementById('archiveNameInput');
+        const name = input.value.trim() || generateDefaultArchiveName();
+
+        // 收集对话流中所有卡片的 HTML
+        const flow = document.getElementById('conversationFlow');
+        const cards = flow.querySelectorAll('.conv-card');
+        const cardsHtml = [];
+        cards.forEach(card => {
+            cardsHtml.push(card.outerHTML);
+        });
+
+        const archive = {
+            id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+            name: name,
+            date: new Date().toISOString(),
+            rounds: state.conversationHistory.length,
+            conversationHistory: JSON.parse(JSON.stringify(state.conversationHistory)),
+            cardsHtml: cardsHtml
+        };
+
+        const archives = getArchives();
+        archives.unshift(archive); // 最新的在前面
+        saveArchives(archives);
+
+        closeArchiveModal();
+        showToast(`已归档：${name}`, 'success');
+
+        // 归档后清空当前对话
+        clearHistory();
+        debugLog(`📦 归档成功: ${name} (${archive.rounds} 轮)`);
+    }
+
+    function toggleHistory() {
+        const overlay = document.getElementById('historyOverlay');
+        overlay.classList.toggle('open');
+        if (overlay.classList.contains('open')) {
+            renderHistoryList();
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+    }
+
+    function renderHistoryList() {
+        const container = document.getElementById('historyContent');
+        const archives = getArchives();
+
+        if (archives.length === 0) {
+            container.innerHTML = `
+                <div class="history-empty">
+                    <div class="history-empty-icon">📂</div>
+                    <p>还没有归档记录</p>
+                    <p style="font-size:0.75rem;margin-top:6px;">对话结束后点击 📦 归档保存</p>
+                </div>
+            `;
+            return;
+        }
+
+        let html = '<div class="history-list">';
+        archives.forEach(archive => {
+            const date = new Date(archive.date);
+            const dateStr = `${date.getMonth() + 1}/${date.getDate()} ${date.getHours().toString().padStart(2,'0')}:${date.getMinutes().toString().padStart(2,'0')}`;
+            const rounds = archive.rounds || 0;
+            const aCount = (archive.conversationHistory || []).filter(h => h.speaker === 'a').length;
+            const bCount = (archive.conversationHistory || []).filter(h => h.speaker === 'b').length;
+            html += `
+                <div class="history-item" onclick="restoreArchive('${archive.id}')">
+                    <div class="history-item-icon">💬</div>
+                    <div class="history-item-info">
+                        <div class="history-item-name">${escapeHtml(archive.name)}</div>
+                        <div class="history-item-meta">
+                            <span>${dateStr}</span>
+                            <span>${rounds} 轮</span>
+                            <span>🟠${aCount} 🔵${bCount}</span>
+                        </div>
+                    </div>
+                    <button class="history-item-delete" onclick="event.stopPropagation();deleteArchive('${archive.id}')" title="删除">🗑️</button>
+                </div>
+            `;
+        });
+        html += '</div>';
+        container.innerHTML = html;
+    }
+
+    function restoreArchive(archiveId) {
+        const archives = getArchives();
+        const archive = archives.find(a => a.id === archiveId);
+        if (!archive) {
+            showToast('归档记录不存在', 'error');
+            return;
+        }
+
+        // 如果当前有未归档的对话，提示用户
+        if (state.conversationHistory.length > 0) {
+            if (!confirm('当前有未归档的对话，还原后将覆盖。是否继续？')) {
+                return;
+            }
+        }
+
+        // 还原对话历史数据
+        state.conversationHistory = archive.conversationHistory || [];
+
+        // 还原卡片 UI
+        const flow = document.getElementById('conversationFlow');
+        flow.innerHTML = '';
+
+        if (archive.cardsHtml && archive.cardsHtml.length > 0) {
+            archive.cardsHtml.forEach(html => {
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = html;
+                const card = wrapper.firstElementChild;
+                if (card) {
+                    // 移除入场动画，避免还原时闪烁
+                    card.style.animation = 'none';
+                    flow.appendChild(card);
+                }
+            });
+        } else if (archive.conversationHistory && archive.conversationHistory.length > 0) {
+            // 降级：从 conversationHistory 重建卡片（无 HTML 缓存时）
+            archive.conversationHistory.forEach(item => {
+                renderAnalysisCard(item.text, item.nvc, item.speaker || 'a');
+            });
+        }
+
+        scrollFlowToBottom();
+        toggleHistory();
+        showToast(`已还原：${archive.name}`, 'success');
+        debugLog(`📋 还原归档: ${archive.name} (${archive.rounds} 轮)`);
+    }
+
+    function deleteArchive(archiveId) {
+        const archives = getArchives();
+        const archive = archives.find(a => a.id === archiveId);
+        if (!archive) return;
+
+        if (!confirm(`确定删除归档"${archive.name}"吗？`)) return;
+
+        const updated = archives.filter(a => a.id !== archiveId);
+        saveArchives(updated);
+        renderHistoryList();
+        showToast('归档已删除', 'success');
+        debugLog(`🗑️ 删除归档: ${archive.name}`);
+    }
+
+    // 归档弹窗 - Enter 确认，ESC 取消
+    document.getElementById('archiveNameInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            confirmArchive();
+        }
+    });
+
+    // 关闭归档弹窗 - 点击遮罩
+    document.getElementById('archiveModalOverlay').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeArchiveModal();
+    });
+
+    // 关闭历史面板 - 点击遮罩
+    document.getElementById('historyOverlay').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) toggleHistory();
+    });
 
     // ---------- 视口高度修正（iOS 100vh 问题的 JS 降级方案）----------
     function setVH() {
@@ -1901,11 +2641,21 @@
         });
     })();
 
-    // ESC 关闭设置
+    // ESC 关闭弹窗/面板
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
-            const overlay = document.getElementById('settingsOverlay');
-            if (overlay.classList.contains('open')) toggleSettings();
+            const archiveModal = document.getElementById('archiveModalOverlay');
+            if (archiveModal.classList.contains('open')) {
+                closeArchiveModal();
+                return;
+            }
+            const historyOverlay = document.getElementById('historyOverlay');
+            if (historyOverlay.classList.contains('open')) {
+                toggleHistory();
+                return;
+            }
+            const settingsOverlay = document.getElementById('settingsOverlay');
+            if (settingsOverlay.classList.contains('open')) toggleSettings();
         }
     });
 
