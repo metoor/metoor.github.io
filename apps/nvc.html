@@ -1131,7 +1131,7 @@
         </div>
 
         <!-- 版权信息 -->
-        <div class="footer-credit">© 2025 Stephen Cai · 和解桥</div>
+        <div class="footer-credit">© 2026 Stephen Cai · 和解桥</div>
     </div>
 
     <script>
@@ -1802,22 +1802,57 @@
             { role: 'system', content: systemPrompt }
         ];
 
-        // 加入最近几轮对话作为上下文（最多5轮）
-        const recentHistory = state.conversationHistory.slice(-5);
+        // 构建全面的历史上下文（最多10轮，字符预算3000）
+        const MAX_HISTORY_ROUNDS = 10;
+        const MAX_CONTEXT_CHARS = 3000;
+        const recentHistory = state.conversationHistory.slice(-MAX_HISTORY_ROUNDS);
         if (recentHistory.length > 0) {
-            let contextIntro = '以下是之前的对话记录（供参考）：\n';
-            recentHistory.forEach((item, idx) => {
-                const speakerLabel = item.speaker === 'a' ? 'A方' : 'B方';
-                contextIntro += `${speakerLabel}：「${item.text}」\n`;
+            let contextBlock = '';
+            let roundNum = 0;
+            let lastSpeaker = null;
+
+            recentHistory.forEach((item) => {
+                // 同一方连续发言不换轮次
+                if (item.speaker !== lastSpeaker) {
+                    roundNum++;
+                    lastSpeaker = item.speaker;
+                }
+
+                const speakerIcon = item.speaker === 'a' ? '🟠' : '🔵';
+                const speakerLabel = item.speaker === 'a' ? 'A方(我)' : 'B方(对方)';
+                const nvc = item.nvc || {};
+
+                let entry = `\n${speakerIcon} ${speakerLabel}：「${item.text}」`;
+                // 附加完整 NVC 分析洞察
+                if (nvc.observe)   entry += `\n   观察：${nvc.observe}`;
+                if (nvc.feel)      entry += `\n   感受：${nvc.feel}`;
+                if (nvc.need)      entry += `\n   需要：${nvc.need}`;
+                if (nvc.request)   entry += `\n   请求：${nvc.request}`;
+                if (nvc.true_intent) entry += `\n   真实意图：${nvc.true_intent}`;
+                if (nvc.improved)   entry += `\n   改进表达：${nvc.improved}`;
+
+                contextBlock += entry;
             });
-            messages.push({ role: 'assistant', content: contextIntro + '\n（以上为历史对话，现在请分析新的发言）' });
+
+            // 字符预算控制：超出时从头部截断
+            if (contextBlock.length > MAX_CONTEXT_CHARS) {
+                contextBlock = contextBlock.substring(contextBlock.length - MAX_CONTEXT_CHARS);
+                // 截断后对齐到完整条目（找第一个 🟠 或 🔵 开头）
+                const firstMarker = contextBlock.search(/[🟠🔵]/);
+                if (firstMarker > 0) contextBlock = contextBlock.substring(firstMarker);
+            }
+
+            messages.push({
+                role: 'assistant',
+                content: `以下是之前的完整对话记录（含分析洞察，供深入理解背景）：${contextBlock}\n\n（以上为历史对话，现在请分析新的发言）`
+            });
         }
 
         // 当前发言
         const speakerLabel = speaker === 'a' ? 'A方（"我"）' : 'B方（"对方"）';
         messages.push({
             role: 'user',
-            content: `当前说话人：${speakerLabel}\n请分析这句话："${userText}"${recentHistory.length > 0 ? '\n\n（请结合上面的对话上下文来理解这句话的背景和情绪）' : ''}`
+            content: `当前说话人：${speakerLabel}\n请分析这句话："${userText}"${recentHistory.length > 0 ? '\n\n（请结合上面的对话上下文和分析洞察来理解这句话的背景和情绪）' : ''}`
         });
 
         // 检测 file:// 协议下的 CORS 问题
