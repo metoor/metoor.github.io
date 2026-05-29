@@ -577,6 +577,52 @@
             font-size: 0.85rem; line-height: 1.7; color: var(--text-secondary);
         }
 
+        /* ============ 参考回复 ============ */
+        .suggested-reply {
+            margin-top: 12px;
+            padding: 14px 16px;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(168,85,247,0.12));
+            border: 1px solid rgba(99,102,241,0.2);
+            position: relative;
+        }
+        .suggested-reply-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .suggested-reply-label {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 0.75rem; font-weight: 600; color: #a78bfa;
+        }
+        .suggested-reply-copy {
+            background: rgba(99,102,241,0.15);
+            border: 1px solid rgba(99,102,241,0.25);
+            color: #a78bfa;
+            border-radius: 6px;
+            padding: 3px 10px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .suggested-reply-copy:hover {
+            background: rgba(99,102,241,0.3);
+        }
+        .suggested-reply-copy:active {
+            transform: scale(0.95);
+        }
+        .suggested-reply-copy.copied {
+            background: rgba(52,211,153,0.2);
+            border-color: rgba(52,211,153,0.3);
+            color: var(--accent-green);
+        }
+        .suggested-reply-content {
+            font-size: 0.88rem;
+            line-height: 1.8;
+            color: var(--text-primary);
+            white-space: pre-wrap;
+        }
+
         /* ============ 空状态 ============ */
         .empty-state {
             flex: 1; display: flex; flex-direction: column;
@@ -1422,8 +1468,16 @@
   "need": "需要洞察：话语背后未被满足的核心需要",
   "request": "请求转化：如果用非暴力沟通方式，可以怎样表达请求",
   "true_intent": "真实意图：透过表面话语，说话者真正想表达什么",
-  "improved": "改进建议：用温和且有效的方式重新表达这句话"
+  "improved": "改进建议：用温和且有效的方式重新表达这句话",
+  "suggested_reply": "参考回复：（仅在 need_reply=true 时提供）基于NVC四要素分析，为听话方生成一条温和、共情的建议回复，帮助化解冲突、回应对方的核心需要"
 }
+
+重要规则：
+- 当提示中包含 need_reply=true 时，必须填写 suggested_reply 字段
+- 当提示中不包含 need_reply 标记或 need_reply=false 时，suggested_reply 字段填写空字符串 ""
+- 参考回复应当：先共情对方的感受和需要，再用"我"语句表达自己的感受和请求
+- 参考回复语气要温和真诚，避免说教、指责或过度解释
+- 参考回复应结合当前对话上下文，回应对方最核心的关切
 
 分析原则：
 1. 观察：只描述事实，不加主观评判和指责
@@ -1833,7 +1887,7 @@
         return state.config[state.currentModel];
     }
 
-    async function callLLM(userText, speaker) {
+    async function callLLM(userText, speaker, needReply) {
         const config = getCurrentConfig();
         if (!config.apiKey) {
             throw new Error('未配置 API Key，请在设置中填写');
@@ -1900,9 +1954,30 @@
 
         // 当前发言
         const speakerLabel = speaker === 'a' ? 'A方（"我"）' : 'B方（"对方"）';
+
+        // 构建 need_reply 标记
+        let needReplyTag = '';
+        if (needReply) {
+            needReplyTag = '\n\nneed_reply=true\n请务必填写 suggested_reply 字段，为A方（听话方）生成一条温和共情的建议回复，帮助回应对方的核心需要、化解冲突。回复应当先共情对方感受，再用"我"语句表达自己的感受和请求。';
+
+            // 批次汇总：收集当前批次内对方连续说的所有话，帮助生成综合参考回复
+            const batchMessages = [];
+            for (let i = state.conversationHistory.length - 1; i >= 0; i--) {
+                if (state.conversationHistory[i].speaker === 'b') {
+                    batchMessages.unshift(state.conversationHistory[i].text);
+                } else {
+                    break;
+                }
+            }
+            // 如果有历史批次消息（多条连续发言），附上汇总提示
+            if (batchMessages.length > 0) {
+                needReplyTag += `\n\n【重要】对方连续发送了${batchMessages.length + 1}条消息，请综合理解所有消息后生成一条统一回复。`;
+            }
+        }
+
         messages.push({
             role: 'user',
-            content: `当前说话人：${speakerLabel}\n请分析这句话："${userText}"${recentHistory.length > 0 ? '\n\n（请结合上面的对话上下文和分析洞察来理解这句话的背景和情绪）' : ''}`
+            content: `当前说话人：${speakerLabel}\n请分析这句话："${userText}"${needReplyTag}${recentHistory.length > 0 ? '\n\n（请结合上面的对话上下文和分析洞察来理解这句话的背景和情绪）' : ''}`
         });
 
         // 检测 file:// 协议下的 CORS 问题
@@ -1919,7 +1994,7 @@
                 const anthropicMessages = messages.filter(m => m.role !== 'system');
                 const requestBody = {
                     model: config.modelName || 'claude-sonnet-4-20250514',
-                    max_tokens: 800,
+                    max_tokens: 1200,
                     system: systemPrompt,
                     messages: anthropicMessages,
                     temperature: 0.7
@@ -1942,7 +2017,7 @@
                     model: config.modelName,
                     messages: messages,
                     temperature: 0.7,
-                    max_tokens: 800
+                    max_tokens: 1200
                 };
                 debugLog(`OpenAI 请求: ${apiBase}/chat/completions`);
 
@@ -2065,12 +2140,20 @@
         if (state.isAnalyzing || state.analysisQueue.length === 0) return;
 
         const task = state.analysisQueue.shift();
-        console.log(`[Queue] 出队开始分析: speaker=${task.speaker}, 剩余队列=${state.analysisQueue.length}`);
-        _doAnalyze(task.text, task.speaker);
+
+        // 批次末尾判定：当前任务是否是连续同角色消息的最后一条
+        // 判定逻辑：队列中下一个任务的 speaker 与当前不同，或队列为空
+        // 参考回复仅针对对方（speaker='b'），且仅在批次末尾时生成
+        let isBatchEnd = state.analysisQueue.length === 0 ||
+                         state.analysisQueue[0].speaker !== task.speaker;
+        let needReply = (task.speaker === 'b') && isBatchEnd;
+
+        console.log(`[Queue] 出队开始分析: speaker=${task.speaker}, isBatchEnd=${isBatchEnd}, needReply=${needReply}, 剩余队列=${state.analysisQueue.length}`);
+        _doAnalyze(task.text, task.speaker, needReply);
     }
 
     // 实际执行分析（内部函数，不直接调用）
-    async function _doAnalyze(text, speaker) {
+    async function _doAnalyze(text, speaker, needReply) {
         state.isAnalyzing = true;
         setStatus('analyzing', `正在分析${speaker === 'a' ? '我' : '对方'}的话...`);
 
@@ -2087,7 +2170,7 @@
         scrollFlowToBottom();
 
         try {
-            const result = await callLLM(text, speaker);
+            const result = await callLLM(text, speaker, needReply);
             indicator.remove();
             renderAnalysisCard(text, result, speaker);
             setStatus(state.isListening ? 'listening' : '准备就绪', state.isListening ? '正在监听语音...' : '准备就绪');
@@ -2169,6 +2252,14 @@
                     <div class="extra-content">${escapeHtml(nvc.improved || '—')}</div>
                 </div>
             </div>
+            ${nvc.suggested_reply ? `
+            <div class="suggested-reply">
+                <div class="suggested-reply-header">
+                    <div class="suggested-reply-label">💬 参考回复</div>
+                    <button class="suggested-reply-copy" onclick="copyReply(this)">复制</button>
+                </div>
+                <div class="suggested-reply-content">${escapeHtml(nvc.suggested_reply)}</div>
+            </div>` : ''}
         `;
 
         flow.appendChild(card);
@@ -2698,6 +2789,49 @@
         return div.innerHTML;
     }
 
+    // 复制参考回复到剪贴板
+    function copyReply(btn) {
+        const replyContent = btn.closest('.suggested-reply').querySelector('.suggested-reply-content');
+        if (!replyContent) return;
+        const text = replyContent.textContent.trim();
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(() => {
+                btn.textContent = '已复制 ✓';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = '复制';
+                    btn.classList.remove('copied');
+                }, 2000);
+            }).catch(() => {
+                fallbackCopy(text, btn);
+            });
+        } else {
+            fallbackCopy(text, btn);
+        }
+    }
+
+    // 降级复制方案
+    function fallbackCopy(text, btn) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+            document.execCommand('copy');
+            btn.textContent = '已复制 ✓';
+            btn.classList.add('copied');
+            setTimeout(() => {
+                btn.textContent = '复制';
+                btn.classList.remove('copied');
+            }, 2000);
+        } catch(e) {
+            showToast('复制失败，请手动选择复制', 'error');
+        }
+        document.body.removeChild(textarea);
+    }
+
     function clearHistory() {
         if (state.conversationHistory.length === 0) return;
         const flow = document.getElementById('conversationFlow');
@@ -2970,7 +3104,9 @@
                 card.appendChild(indicator);
 
                 try {
-                    const result = await callLLM(item.text, item.speaker);
+                    // 重新分析时，如果交换后该条变成"对方"说的话，则生成参考回复
+                    const reanalyzeNeedReply = (item.speaker === 'b');
+                    const result = await callLLM(item.text, item.speaker, reanalyzeNeedReply);
                     // 更新数据
                     state.conversationHistory[hIdx].nvc = result;
                     // 重新渲染卡片内容
@@ -3034,11 +3170,13 @@
             label.innerHTML = `${speakerIcon} ${speakerName}`;
         }
 
-        // 移除旧的 nvc-analysis 和 nvc-extras
+        // 移除旧的 nvc-analysis、nvc-extras 和 suggested-reply
         const oldAnalysis = card.querySelector('.nvc-analysis');
         const oldExtras = card.querySelector('.nvc-extras');
+        const oldReply = card.querySelector('.suggested-reply');
         if (oldAnalysis) oldAnalysis.remove();
         if (oldExtras) oldExtras.remove();
+        if (oldReply) oldReply.remove();
 
         // 插入新的 NVC 内容
         const analysisDiv = document.createElement('div');
@@ -3076,6 +3214,20 @@
             </div>
         `;
         card.appendChild(extrasDiv);
+
+        // 渲染参考回复（如有）
+        if (nvc.suggested_reply) {
+            const replyDiv = document.createElement('div');
+            replyDiv.className = 'suggested-reply';
+            replyDiv.innerHTML = `
+                <div class="suggested-reply-header">
+                    <div class="suggested-reply-label">💬 参考回复</div>
+                    <button class="suggested-reply-copy" onclick="copyReply(this)">复制</button>
+                </div>
+                <div class="suggested-reply-content">${escapeHtml(nvc.suggested_reply)}</div>
+            `;
+            card.appendChild(replyDiv);
+        }
     }
 
     // ---------- 归档 & 历史模块 ----------
