@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>孙子兵法 · 投资作战手册</title>
+<style>
+  :root{
+    --bg:#fcfbf8;
+    --ink:#26261f;
+    --ink-soft:#5d5b4f;
+    --green:#2d5a3d;
+    --green-deep:#1f4330;
+    --green-light:#3d7050;
+    --green-wash:#e9efe9;
+    --seal:#b23b2e;
+    --line:#e4e0d5;
+    --kai:"Kaiti SC","STKaiti","KaiTi","楷体",serif;
+    --song:"Songti SC","STSong","SimSun","宋体",serif;
+    --sans:"PingFang SC","Microsoft YaHei","Hiragino Sans GB","Source Han Sans SC",sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:var(--sans);line-height:1.85;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* 页眉 */
+  header.hero{
+    position:relative;
+    padding:clamp(2.4rem,6vw,4.5rem) clamp(1.2rem,5vw,3rem) clamp(2rem,4vw,3rem);
+    border-bottom:1px solid var(--line);
+    background:radial-gradient(120% 100% at 100% 0%, rgba(45,90,61,0.05), transparent 60%), var(--bg);
+    overflow:hidden;
+  }
+  .hero-inner{
+    max-width:1080px;margin:0 auto;
+    display:flex;gap:clamp(1rem,3vw,2.4rem);align-items:flex-start;flex-wrap:wrap;
+  }
+  .hero-text{flex:1 1 320px;min-width:0;}
+  .eyebrow{
+    font-family:var(--song);letter-spacing:.5em;color:var(--green);
+    font-size:.8rem;margin:0 0 .9rem;text-indent:.5em;
+  }
+  h1.title{
+    font-family:var(--song);font-weight:700;
+    font-size:clamp(2rem,6vw,3.4rem);line-height:1.15;margin:0 0 .4rem;color:var(--ink);
+  }
+  .title small{
+    display:block;font-size:.4em;letter-spacing:.3em;color:var(--ink-soft);
+    font-weight:400;margin-top:.6rem;text-indent:.3em;
+  }
+  .core{
+    margin:1.6rem 0 0;padding:1rem 1.2rem;border-left:3px solid var(--green);
+    background:var(--green-wash);font-family:var(--kai);
+    font-size:clamp(1.05rem,2.6vw,1.35rem);color:var(--green-deep);line-height:1.7;
+  }
+  .core b{color:var(--seal);font-weight:700;}
+
+  /* 印章 */
+  .seal{
+    flex:0 0 auto;width:clamp(96px,18vw,138px);height:clamp(96px,18vw,138px);margin-top:.4rem;
+    border:3px solid var(--seal);border-radius:8px;color:var(--seal);
+    display:grid;place-items:center;font-family:var(--kai);font-weight:700;
+    font-size:clamp(1.7rem,4vw,2.4rem);line-height:1.05;text-align:center;
+    transform:rotate(-4deg);box-shadow:inset 0 0 0 2px rgba(178,59,46,0.25);position:relative;opacity:.92;
+  }
+  .seal::before{content:"";position:absolute;inset:6px;border:1px solid rgba(178,59,46,0.4);border-radius:4px;}
+  .seal span{display:block;letter-spacing:.05em;}
+  .seal .s2{margin-top:.1em;}
+
+  /* 布局 */
+  .layout{
+    max-width:1080px;margin:0 auto;padding:0 clamp(1.2rem,5vw,3rem);
+    display:flex;gap:clamp(1.4rem,4vw,3rem);align-items:flex-start;
+  }
+
+  /* 粘性目录 */
+  nav.toc{
+    position:sticky;top:0;flex:0 0 210px;align-self:flex-start;
+    padding:1.6rem 0;border-right:1px solid var(--line);
+  }
+  .toc h2{font-family:var(--song);font-size:.82rem;letter-spacing:.35em;color:var(--green);margin:0 0 1rem;text-indent:.2em;}
+  .toc-btn{
+    display:flex;align-items:center;gap:.6rem;width:100%;text-align:left;
+    background:none;border:none;border-left:2px solid transparent;color:var(--ink-soft);
+    font-family:var(--sans);font-size:.92rem;padding:.5rem .7rem;margin:0 0 .2rem;
+    cursor:pointer;transition:color .2s,border-color .2s,background .2s;
+  }
+  .toc-btn svg{width:16px;height:16px;flex:0 0 16px;stroke:currentColor;}
+  .toc-btn:hover{color:var(--green);}
+  .toc-btn.active{color:var(--green-deep);border-left-color:var(--green);background:var(--green-wash);font-weight:600;}
+
+  main{flex:1 1 auto;min-width:0;padding:1.6rem 0 4rem;}
+  section{padding:2.2rem 0;border-bottom:1px solid var(--line);scroll-margin-top:1rem;}
+  section:last-child{border-bottom:none;}
+  .sec-label{
+    display:inline-flex;align-items:center;gap:.55rem;font-family:var(--song);
+    color:var(--green);font-size:.9rem;letter-spacing:.25em;margin:0 0 .3rem;
+  }
+  .sec-label svg{width:18px;height:18px;stroke:var(--green);}
+  h2.sec-title{font-family:var(--song);font-size:clamp(1.5rem,4vw,2.1rem);margin:.1rem 0 1.4rem;color:var(--ink);}
+  .lead{color:var(--ink-soft);margin:0 0 1.6rem;max-width:62ch;}
+
+  /* 谋略卡 */
+  .strategy{border:1px solid var(--line);border-radius:10px;padding:1.4rem 1.5rem;margin:0 0 1.3rem;background:#fff;box-shadow:0 1px 0 rgba(45,90,61,0.04);}
+  .strat-head{display:flex;align-items:center;gap:.9rem;margin:0 0 .9rem;}
+  .strat-icon{flex:0 0 auto;width:42px;height:42px;border-radius:8px;background:var(--green-wash);display:grid;place-items:center;}
+  .strat-icon svg{width:22px;height:22px;stroke:var(--green-deep);}
+  .strat-head h3{font-family:var(--song);font-size:1.28rem;margin:0;color:var(--ink);}
+  .strat-head .sub{font-size:.82rem;color:var(--green);letter-spacing:.05em;margin:.15rem 0 0;}
+  blockquote.quote{margin:0 0 1rem;padding:.7rem 1rem;background:var(--green-wash);border-radius:6px;font-family:var(--kai);font-size:1.06rem;color:var(--green-deep);line-height:1.75;}
+  .map h4{font-size:.82rem;letter-spacing:.2em;color:var(--seal);margin:0 0 .5rem;font-family:var(--song);}
+  .map p{margin:0;color:var(--ink);}
+  .map ul{margin:.6rem 0 0;padding-left:1.1rem;color:var(--ink);}
+  .map li{margin:0 0 .4rem;}
+  .map .tag{display:inline-block;margin:.7rem .4rem 0 0;padding:.2rem .7rem;font-size:.78rem;border:1px solid var(--green-light);color:var(--green-deep);border-radius:999px;background:rgba(45,90,61,0.04);}
+
+  /* 术语表 */
+  .glossary{width:100%;border-collapse:collapse;font-size:.94rem;}
+  .glossary th,.glossary td{text-align:left;padding:.75rem .8rem;border-bottom:1px solid var(--line);vertical-align:top;}
+  .glossary thead th{font-family:var(--song);color:var(--green);letter-spacing:.1em;font-size:.82rem;border-bottom:2px solid var(--green-light);}
+  .glossary td:first-child{font-family:var(--kai);font-weight:700;color:var(--ink);white-space:nowrap;}
+  .glossary tr:hover td{background:rgba(45,90,61,0.03);}
+
+  /* 三条铁律 */
+  .principles{display:grid;gap:1.2rem;}
+  @media(min-width:640px){.principles{grid-template-columns:repeat(3,1fr);}}
+  .principle{border:1px solid var(--line);border-top:3px solid var(--green);border-radius:10px;padding:1.3rem 1.3rem 1.4rem;background:#fff;}
+  .principle .num{font-family:var(--song);font-size:1.6rem;color:var(--green);line-height:1;margin:0 0 .7rem;}
+  .principle h3{font-family:var(--song);font-size:1.15rem;margin:0 0 .6rem;color:var(--ink);}
+  .principle p{margin:0;color:var(--ink-soft);font-size:.93rem;}
+
+  footer{max-width:1080px;margin:0 auto;padding:2rem clamp(1.2rem,5vw,3rem) 3rem;color:var(--ink-soft);font-size:.82rem;text-align:center;border-top:1px solid var(--line);}
+  footer .mark{color:var(--green);font-family:var(--song);letter-spacing:.2em;}
+
+  /* 移动端目录转顶部横条 */
+  @media(max-width:820px){
+    .layout{flex-direction:column;gap:0;}
+    nav.toc{position:sticky;top:0;z-index:20;flex:none;width:100%;border-right:none;border-bottom:1px solid var(--line);background:rgba(252,251,248,0.94);backdrop-filter:blur(6px);padding:.7rem 0;}
+    nav.toc h2{display:none;}
+    .toc-list{display:flex;gap:.4rem;overflow-x:auto;padding:0 .4rem;-webkit-overflow-scrolling:touch;}
+    .toc-btn{width:auto;flex:0 0 auto;white-space:nowrap;border-left:none;border-bottom:2px solid transparent;padding:.4rem .7rem;border-radius:999px;font-size:.85rem;}
+    .toc-btn.active{border-left:none;border-bottom-color:var(--green);background:var(--green-wash);}
+    .toc-btn svg{display:none;}
+    main{padding-top:1.4rem;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <p class="eyebrow">公版经典 · 股市实战</p>
+      <h1 class="title">投资作战手册<small>孙子兵法 × 二级市场对抗性决策</small></h1>
+      <p class="core">一句话内核：<b>股市是一套信息不完全、对手会反击、且你最大的敌人是自己的对抗性决策系统。</b></p>
+    </div>
+    <div class="seal" title="兵法" aria-label="兵法印章">
+      <span class="s1">兵</span><span class="s2">法</span>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <nav class="toc" aria-label="目录">
+    <h2>目 录</h2>
+    <div class="toc-list">
+      <button class="toc-btn active" data-target="core" onclick="goTo('core')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 12l-4-4-4 4"/><path d="M12 16V8"/></svg>内核
+      </button>
+      <button class="toc-btn" data-target="miaosuan" onclick="goTo('miaosuan')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>庙算
+      </button>
+      <button class="toc-btn" data-target="guidao" onclick="goTo('guidao')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>诡道
+      </button>
+      <button class="toc-btn" data-target="shouben" onclick="goTo('shouben')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>守本
+      </button>
+      <button class="toc-btn" data-target="buzhan" onclick="goTo('buzhan')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/></svg>不战
+      </button>
+      <button class="toc-btn" data-target="zhangduo" onclick="goTo('zhangduo')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="22" x2="18" y1="12" y2="12"/><line x1="6" x2="2" y1="12" y2="12"/><line x1="12" x2="12" y1="6" y2="2"/><line x1="12" x2="12" y1="22" y2="18"/></svg>掌舵
+      </button>
+      <button class="toc-btn" data-target="zhengqi" onclick="goTo('zhengqi')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>正奇
+      </button>
+      <button class="toc-btn" data-target="rushui" onclick="goTo('rushui')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/></svg>如水
+      </button>
+      <button class="toc-btn" data-target="zhiji" onclick="goTo('zhiji')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>知己
+      </button>
+      <button class="toc-btn" data-target="glossary" onclick="goTo('glossary')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>速查
+      </button>
+      <button class="toc-btn" data-target="iron" onclick="goTo('iron')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M2 12h20"/><circle cx="12" cy="12" r="9"/></svg>铁律
+      </button>
+    </div>
+  </nav>
+
+  <main>
+
+    <!-- 内核 -->
+    <section id="core">
+      <p class="sec-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        写在前面
+      </p>
+      <h2 class="sec-title">为什么股市是兵法天然的战场</h2>
+      <p class="lead">股市同时满足这套系统的两个前提：<b>信息不完全</b>（你永远比内幕者晚知道）、<b>对抗性</b>（你的盈利来自别人的错误定价或亏损，且对手会反击——你追涨时有人在派发，你恐慌时有人在捡筹）。</p>
+      <blockquote class="quote">「兵者，国之大事，死生之地，存亡之道，不可不察也。」—— 计篇</blockquote>
+      <p class="lead">但股市与战场有一处本质不同：它并非纯零和（好公司创造价值、复利生钱），而「对手」分散且夹杂随机冲击。所以这里最大的敌人往往不是某个庄家，而是<b>你自己</b>。下面的八条，把十三篇翻译成可以在交易终端前照做的纪律。</p>
+    </section>
+
+    <!-- 庙算 -->
+    <section id="miaosuan">
+      <p class="sec-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+        战前庙算
+      </p>
+      <h2 class="sec-title">五事七计 · 买入前的尽职调查</h2>
+      <article class="strategy">
+        <div class="strat-head">
+          <span class="strat-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg></span>
+          <div><h3>五事七计</h3><p class="sub">计篇 · 未战而庙算胜者，得算多也</p></div>
+        </div>
+        <blockquote class="quote">「一曰道，二曰天，三曰地，四曰将，五曰法。」「吾以此知胜负矣。」</blockquote>
+        <div class="map">
+          <h4>股市映射：下注前的七维记分卡</h4>
+          <ul>
+            <li><b>道</b>：生意是否符合长期趋势，管理层与股东利益是否一致（股权绑定、分红意愿）。</li>
+            <li><b>天</b>：宏观周期、利率与流动性环境（加息/降息、信用周期位置）。</li>
+            <li><b>地</b>：行业护城河与竞争位势（市占率、转换成本、网络效应）。</li>
+            <li><b>将</b>：管理层能力与诚信（资本配置记录、是否诚实对待股东）。</li>
+            <li><b>法</b>：公司治理与财务纪律（负债率、现金流质量、关联交易）。</li>
+          </ul>
+          <p>七计是把这五项逐项对比同行，先清楚自己买的是「赢在哪、输在哪」。对应基本面尽职调查——别靠一条消息就下单。</p>
+          <span class="tag">基本面研究</span><span class="tag">同行对比</span><span class="tag">Go / No-Go 清单</span>
+        </div>
+      </article>
+    </section>
+
+    <!-- 诡道 -->
+    <section id="guidao">
+      <p class="sec-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
+        识破诡道
+      </p>
+      <h2 class="sec-title">兵者诡道 · 别追已经定价的信号</h2>
+      <article class="strategy">
+        <div class="strat-head">
+          <span class="strat-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg></span>
+          <div><h3>兵者诡道</h3><p class="sub">计篇 · 能而示之不能，攻其无备</p></div>
+        </div>
+        <blockquote class="quote">「兵者，诡道也。故能而示之不能，用而示之不用……攻其无备，出其不意。」</blockquote>
+        <div class="map">
+          <h4>股市映射：市场里到处是「示形」</h4>
+          <ul>
+            <li>公司靓丽指引、分析师一致看好，常是阶段性顶部或派发窗口——那是「示之不能用」。</li>
+            <li>暴跌新闻里常有人在悄悄捡筹；别让 headline 替你做决定。</li>
+            <li><b>别暴露</b>你的挂单规模与意图，避免被抢跑、滑点吃掉收益。</li>
+            <li><b>攻其无备</b>：在无人关注、预期极低、催化剂尚未发酵处提前埋伏。</li>
+          </ul>
+          <p>警惕「利多出尽」与「利空出尽」——它们都是诡道的现代版本。诡道不是骗，是管理信号、制造误判、打时间差。</p>
+          <span class="tag">逆向布局</span><span class="tag">信号管理</span><span class="tag">避开噪音</span>
+        </div>
+      </article>
+    </section>
+
+    <!-- 守本 -->
+    <section id="shouben">
+      <p class="sec-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        本金守卫
+      </p>
+      <h2 class="sec-title">先为不可胜 · 保护本金优先于追求收益</h2>
+      <article class="strategy">
+        <div class="strat-head">
+          <span class="strat-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+          <div><h3>先为不可胜</h3><p class="sub">形篇 · 不可胜在己，可胜在敌</p></div>
+        </div>
+        <blockquote class="quote">「昔之善战者，先为不可胜，以待敌之可胜。不可胜在己，可胜在敌。」</blockquote>
+        <div class="map">
+          <h4>股市映射：你控制不了赚不赚，但控制得出不出局</h4>
+          <ul>
+            <li>单笔仓位上限（例如不超总资金的某一比例），不用杠杆押上身家。</li>
+            <li>预设止损与对冲，把错误限制在可接受范围内。</li>
+            <li>留存现金（runway），让任何一次误判都伤不到根本。</li>
+          </ul>
+          <p>「立于不败之地」＝先确保自己一直在桌上，等市场犯错时你还有子弹。本金不在，一切归零。</p>
+          <span class="tag">仓位管理</span><span class="tag">止损对冲</span><span class="tag">现金储备</span>
+        </div>
+      </article>
+    </section>
+
+    <!-- 不战 -->
+    <section id="buzhan">
+      <p class="sec-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/></svg>
+        不战而胜
+      </p>
+      <h2 class="sec-title">不战而屈人之兵 · 最好的操作是不操作</h2>
+      <article class="strategy">
+        <div class="strat-head">
+          <span class="strat-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/></svg></span>
+          <div><h3>不战而胜</h3><p class="sub">谋攻篇 · 百战百胜，非善之善者也</p></div>
+        </div>
+        <blockquote class="quote">「不战而屈人之兵，善之善者也。」</blockquote>
+        <div class="map">
+          <h4>股市映射：频繁交易是合法的亏钱方式</h4>
+          <ul>
+            <li>择时、追涨杀跌这种「战斗」，交易成本＋情绪损耗会吃掉大部分收益。</li>
+            <li>构建低成本、分散、有耐心的组合，用长期持有「不战而胜」地熨平噪音。</li>
+            <li>多数下跌不必迎战——用时间换空间，让复利替你打仗。</li>
+            <li>被动指数化本身，就是用「全胜」思路击败主动噪音。</li>
+          </ul>
+          <span class="tag">降低换手</span><span class="tag">长期持有</span><span class="tag">指数化</span>
+        </div>
+      </article>
+    </section>
+
+    <!-- 掌舵 -->
+    <section id="zhangduo">
+      <p class="sec-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="22" x2="18" y1="12" y2="12"/><line x1="6" x2="2" y1="12" y2="12"/><line x1="12" x2="12" y1="6" y2="2"/><line x1="12" x2="12" y1="22" y2="18"/></svg>
+        规则掌舵
+      </p>
+      <h2 class="sec-title">致人而不致于人 · 让预案替你掌舵</h2>
+      <article class="strategy">
+        <div class="strat-head">
+          <span class="strat-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="22" x2="18" y1="12" y2="12"/><line x1="6" x2="2" y1="12" y2="12"/><line x1="12" x2="12" y1="6" y2="2"/><line x1="12" x2="12" y1="22" y2="18"/></svg></span>
+          <div><h3>致人而不致于人</h3><p class="sub">虚实篇 · 善战者，致人而不致于人</p></div>
+        </div>
+        <blockquote class="quote">「善战者，致人而不致于人。」</blockquote>
+        <div class="map">
+          <h4>股市映射：别被行情牵着走</h4>
+          <ul>
+            <li>提前定好入场 / 出场 / 仓位规则，<b>让市场来你的价格</b>（挂限价、耐心等），而非你追市场。</li>
+            <li>市场用恐惧与贪婪「致你于人」——不按预案反应，就是交出了方向盘。</li>
+            <li>用清单与触发器决策，把情绪排除在交易回路之外。</li>
+          </ul>
+          <p>被动应对是大多数败局的开端：别人恐慌你也割、别人狂热你也追，等于把方向盘交了出去。</p>
+          <span class="tag">交易清单</span><span class="tag">限价挂单</span><span class="tag">情绪隔离</span>
+        </div>
+      </article>
+    </section>
+
+    <!-- 正奇 -->
+    <section id="zhengqi">
+      <p class="sec-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        攻守结构
+      </p>
+      <h2 class="sec-title">以正合，以奇胜 · 核心仓 + 卫星仓</h2>
+      <article class="strategy">
+        <div class="strat-head">
+          <span class="strat-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
+          <div><h3>以正合，以奇胜</h3><p class="sub">势篇 · 善出奇者，无穷如天地</p></div>
+        </div>
+        <blockquote class="quote">「凡战者，以正合，以奇胜。」</blockquote>
+        <div class="map">
+          <h4>股市映射：八成正兵稳住，两成奇兵破局</h4>
+          <ul>
+            <li><b>正兵</b>：主策略与底仓（宽基指数、红利、长期体系）——接住波动、贡献基准收益。</li>
+            <li><b>奇兵</b>：战术机会（行业轮动、逆向、期权、打新）——打出超额收益。</li>
+          </ul>
+          <p>只正无奇，永远平庸；只奇不正，一击不中便崩盘。把大部分资源压在基本盘，留一小部分去赌那个非常规的突破口。</p>
+          <span class="tag">核心-卫星</span><span class="tag">资产配置</span><span class="tag">战术超额</span>
+        </div>
+      </article>
+    </section>
+
+    <!-- 如水 -->
+    <section id="rushui">
+      <p class="sec-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/></svg>
+        随市而变
+      </p>
+      <h2 class="sec-title">兵形象水 · 没有永远有效的策略</h2>
+      <article class="strategy">
+        <div class="strat-head">
+          <span class="strat-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/></svg></span>
+          <div><h3>兵形象水</h3><p class="sub">虚实篇 · 兵无常势，水无常形</p></div>
+        </div>
+        <blockquote class="quote">「兵无常势，水无常形；能因敌变化而取胜者，谓之神。」</blockquote>
+        <div class="map">
+          <h4>股市映射：避开拥挤，流向阻力最小处</h4>
+          <ul>
+            <li>牛熊切换、价值/成长轮动、利率方向，都在改写「虚实」。</li>
+            <li>避开拥挤交易（实＝人多的地方），把仓位搬到阻力最小、流动性最友好的方向（虚）。</li>
+            <li>定期重估风格与行业的「虚实」，动态再平衡。</li>
+          </ul>
+          <p>别爱上你的逻辑，要爱上你的目标；按价格行为而非执念调整。僵化执行过时策略，是对手最乐意看到的。</p>
+          <span class="tag">风格轮动</span><span class="tag">动态再平衡</span><span class="tag">避实击虚</span>
+        </div>
+      </article>
+    </section>
+
+    <!-- 知己 -->
+    <section id="zhiji">
+      <p class="sec-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        最大的敌人
+      </p>
+      <h2 class="sec-title">知己知彼 · 最大的对手是你自己</h2>
+      <article class="strategy">
+        <div class="strat-head">
+          <span class="strat-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+          <div><h3>知己知彼</h3><p class="sub">谋攻篇 · 知彼知己，百战不殆</p></div>
+        </div>
+        <blockquote class="quote">「知彼知己，百战不殆。」</blockquote>
+        <div class="map">
+          <h4>股市映射：先战胜自己，再谈战胜市场</h4>
+          <ul>
+            <li><b>知彼</b>：读懂市场结构——交易机制、资金流向、估值锚、参与者行为。</li>
+            <li><b>知己</b>：坦诚面对你的风险承受、认知偏差与情绪（损失厌恶、确认偏误、羊群效应）。</li>
+          </ul>
+          <p>多数长期跑输，不是输给市场，而是输给自己的行为。风控的第一课，是管理好下单前的那个自己。</p>
+          <span class="tag">行为风控</span><span class="tag">认知偏差</span><span class="tag">情绪管理</span>
+        </div>
+      </article>
+    </section>
+
+    <!-- 速查 -->
+    <section id="glossary">
+      <p class="sec-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        速查
+      </p>
+      <h2 class="sec-title">投资术语速查 · 从文言到盘口</h2>
+      <table class="glossary">
+        <thead>
+          <tr><th>概念</th><th>原文语境</th><th>投资语境</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>道</td><td>令民与上同意</td><td>长期趋势契合 + 股东利益一致</td></tr>
+          <tr><td>天</td><td>阴阳寒暑</td><td>宏观周期 / 利率与流动性</td></tr>
+          <tr><td>地</td><td>远近险易</td><td>护城河 / 行业位势</td></tr>
+          <tr><td>将</td><td>智信仁勇严</td><td>管理层能力与诚信</td></tr>
+          <tr><td>法</td><td>曲制官道</td><td>公司治理 / 财务纪律</td></tr>
+          <tr><td>庙算</td><td>多算胜，少算不胜</td><td>买入前尽职调查</td></tr>
+          <tr><td>诡道</td><td>能而示之不能</td><td>信息误导 / 噪音 / 利多利空出尽</td></tr>
+          <tr><td>先胜</td><td>先为不可胜</td><td>本金守卫 / 仓位上限 / 止损</td></tr>
+          <tr><td>不战</td><td>不战而屈人之兵</td><td>少交易 / 长期持有 / 指数化</td></tr>
+          <tr><td>致人</td><td>致人而不致于人</td><td>规则化 / 预案交易 / 限价挂单</td></tr>
+          <tr><td>正奇</td><td>以正合，以奇胜</td><td>核心仓 + 卫星仓</td></tr>
+          <tr><td>虚实</td><td>避实而击虚</td><td>拥挤度 / 资金流向 / 风格轮动</td></tr>
+          <tr><td>知己</td><td>知彼知己</td><td>认知偏差 / 行为风控</td></tr>
+          <tr><td>全胜</td><td>不战而胜</td><td>低成本被动 + 时间复利</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 铁律 -->
+    <section id="iron">
+      <p class="sec-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M2 12h20"/><circle cx="12" cy="12" r="9"/></svg>
+        带走
+      </p>
+      <h2 class="sec-title">可以立刻带走的三条铁律</h2>
+      <div class="principles">
+        <div class="principle">
+          <div class="num">壹</div>
+          <h3>先守本，再求胜</h3>
+          <p>任何下单前先问：「这笔最大会亏多少、我扛不扛得住？」本金不在，一切归零。保护本金永远排在追求收益前面。</p>
+        </div>
+        <div class="principle">
+          <div class="num">贰</div>
+          <h3>让规矩掌舵</h3>
+          <p>提前写好入场、出场与仓位，行情来了照做，不临时起意、不被情绪将死。用清单把恐惧与贪婪挡在交易回路之外。</p>
+        </div>
+        <div class="principle">
+          <div class="num">叁</div>
+          <h3>如水而变，别爱上逻辑</h3>
+          <p>定期重估市场虚实，把仓位搬向阻力最小处；承认错误比坚持错误便宜。目标不变，打法随市况而变。</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <p class="mark">兵 法</p>
+  <p>本页内容蒸馏自公版《孙子兵法》十三篇，专为二级市场实战重写，不含外部依赖，可离线保存与分享。仅供方法论参考，不构成任何投资建议。</p>
+</footer>
+
+<script>
+  function goTo(id){
+    var el = document.getElementById(id);
+    if(el){ el.scrollIntoView({behavior:'smooth', block:'start'}); }
+  }
+
+  var sections = document.querySelectorAll('main section[id]');
+  var buttons = document.querySelectorAll('.toc-btn');
+
+  function setActive(id){
+    buttons.forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-target') === id);
+    });
+  }
+
+  if('IntersectionObserver' in window){
+    var observer = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){ setActive(e.target.id); }
+      });
+    }, { rootMargin: '-15% 0px -75% 0px', threshold: 0 });
+    sections.forEach(function(s){ observer.observe(s); });
+  }
+
+  buttons.forEach(function(b){
+    b.addEventListener('click', function(){
+      setActive(b.getAttribute('data-target'));
+    });
+  });
+</script>
+
+</body>
+</html>
